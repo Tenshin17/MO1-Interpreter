@@ -23,13 +23,14 @@
           <component id="d21b0" class="javax.swing.JButton" binding="btnRun">
             <constraints/>
             <properties>
-              <text value="Run"/>
+              <text value="Parse"/>
             </properties>
           </component>
           <component id="5a2cd" class="javax.swing.JButton" binding="btnTree">
             <constraints/>
             <properties>
               <text value="Parse Tree"/>
+              <visible value="false"/>
             </properties>
           </component>
           <component id="a68d2" class="javax.swing.JButton" binding="btnClear">

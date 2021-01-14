@@ -49,6 +49,7 @@ public class IDE {
 
     public void run(String srccode){
 
+            txaConsole.setText("");
             CharStream input = CharStreams.fromString(srccode);
             Java8Lexer lexer = new Java8Lexer(input);
             Java8Parser parser = new Java8Parser(new CommonTokenStream(lexer));

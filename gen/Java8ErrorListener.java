@@ -31,7 +31,7 @@ public class Java8ErrorListener extends BaseErrorListener {
         // Collections.reverse(stack);
 
 
-        /*
+
         if (thisError > lastError + 10) {
             lastError = thisError - 10;
         }
@@ -41,8 +41,9 @@ public class Java8ErrorListener extends BaseErrorListener {
                 System.err.println(token.toString());
         }
         lastError = thisError;
-        */
 
+
+        offSymbol = tokens.get(thisError-1);
 
         //List<String> stack = ((Parser)recognizer).getRuleInvocationStack();
         //Collections.reverse(stack);
@@ -52,6 +53,7 @@ public class Java8ErrorListener extends BaseErrorListener {
         String errmsgstmt = msg.split("'")[0].toString();
         String errmsgsymbol = msg.split("'")[1].toString();
         String erroffsymbol = offendingSymbol.toString().split("'")[1];
+        //String errmsgsymbol = offSymbol.toString().split("'")[1];
 //        System.out.println("line "+line);
 //        System.out.println("charpos "+charPositionInLine);
 //        System.out.println("errmsgstmt "+errmsgstmt);
@@ -77,6 +79,7 @@ public class Java8ErrorListener extends BaseErrorListener {
         {
 //            System.out.println("ERROR: at line "+line+":"+charPositionInLine+" : "+msg + "OFFENDING SYMBOL :" +erroffsymbol);
 //            System.out.println("\t\tEXTRANEOUS");
+            errmsgsymbol = offSymbol.toString().split("'")[1];
             ErrorMessage = "[EXTRA SYMBOL] At line: " + line +  " Character Position: " + charPositionInLine + " extra symbol: \"" + errmsgsymbol +"\"";
 
          }
@@ -85,7 +88,8 @@ public class Java8ErrorListener extends BaseErrorListener {
 
 //            System.out.println("ERROR: at line "+line+":"+charPositionInLine+" : "+msg + "OFFENDING SYMBOL :" +erroffsymbol);
 //            System.out.println("\t\tNO ALTERNATIVE");
-            ErrorMessage = "[SUGGESTION] At line: " + line + "  consider changing(add/remove) before/after the symbol \"" + erroffsymbol +"\"";
+            erroffsymbol = offSymbol.toString().split("'")[1];
+            ErrorMessage = "[SUGGESTION] At line: " + line + "  consider changing the symbol \"" + erroffsymbol +"\"";
         }
         else
         {

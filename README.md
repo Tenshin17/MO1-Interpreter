@@ -11,7 +11,7 @@ Members:
   
   Instructions:
   1. Download/clone/fork this repository.
-  2. Download Antlr complete and java runtime from https://www.antlr.org/download.html
+  2. Download Antlr complete and antlr runtime from https://www.antlr.org/download.html
   3. Open IntelliJ.
   4. Add antlr complete and antlr runtime into the Project Strucure.
   5. Run IDE.java in IntelliJ.

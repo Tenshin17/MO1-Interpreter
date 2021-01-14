@@ -2439,7 +2439,7 @@ public class IDE {
             parser.compilationUnit();
             List<String> errlist = errorListener.getErrors();
             for(String a : errlist){
-                System.out.println(a);
+                //System.out.println(a);
                 txaConsole.append(a + "\n");
             }
     }

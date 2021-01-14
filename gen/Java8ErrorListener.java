@@ -31,7 +31,7 @@ public class Java8ErrorListener extends BaseErrorListener {
         // Collections.reverse(stack);
 
 
-
+        /*
         if (thisError > lastError + 10) {
             lastError = thisError - 10;
         }
@@ -41,7 +41,7 @@ public class Java8ErrorListener extends BaseErrorListener {
                 System.err.println(token.toString());
         }
         lastError = thisError;
-
+        */
 
         offSymbol = tokens.get(thisError-1);
 

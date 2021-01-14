@@ -7,7 +7,7 @@ Members:
   
   Xu, Aaron
   
-  All the codes as well as the main function is located at IDE.java
+  All the codes as well as the main function is located at src/IDE.java
   
   Instructions:
   1. Download/clone/fork this repository.

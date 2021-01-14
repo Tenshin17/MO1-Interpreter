@@ -89,7 +89,7 @@ public class Java8ErrorListener extends BaseErrorListener {
 //            System.out.println("ERROR: at line "+line+":"+charPositionInLine+" : "+msg + "OFFENDING SYMBOL :" +erroffsymbol);
 //            System.out.println("\t\tNO ALTERNATIVE");
             erroffsymbol = offSymbol.toString().split("'")[1];
-            ErrorMessage = "[SUGGESTION] At line: " + line + "  consider changing the symbol \"" + erroffsymbol +"\"";
+            ErrorMessage = "[SUGGESTION] At line: " + line + "  consider inserting a symbol or changing the symbol \"" + erroffsymbol +"\"";
         }
         else
         {

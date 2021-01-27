@@ -53,7 +53,7 @@ public class IDE {
             CharStream input = CharStreams.fromString(srccode);
             Java8Lexer lexer = new Java8Lexer(input);
             Java8Parser parser = new Java8Parser(new CommonTokenStream(lexer));
-            parser.addParseListener(new Java8ParserListener() {
+            parser.addParseListener(new Java8Listener() {
                 @Override
                 public void enterLiteral(Java8Parser.LiteralContext ctx) {
 

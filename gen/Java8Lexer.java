@@ -1,4 +1,4 @@
-// Generated from C:/Users/Mark Louis S. Lim/Desktop/LECTURES/4th Year Term 1/CMPILER/MO1/MO1/src\Java8Lexer.g4 by ANTLR 4.9
+// Generated from C:/Users/Mark Louis S. Lim/Desktop/LECTURES/4th Year Term 1/CMPILER/MO1-Interpreter/src\Java8.g4 by ANTLR 4.9
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -154,7 +154,7 @@ public class Java8Lexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "Java8Lexer.g4"; }
+	public String getGrammarFileName() { return "Java8.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

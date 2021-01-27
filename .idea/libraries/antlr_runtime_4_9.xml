@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="antlr-runtime-4.9">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../ParserPS/antlr-runtime-4.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/antlr-runtime-4.9.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

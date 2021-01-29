@@ -1,5 +1,4 @@
-package baraco.execution.commands.simple;
-//package PrintScan
+package PrintScanp;
 
 import baraco.builder.ParserHandler;
 import baraco.execution.commands.EvaluationCommand;

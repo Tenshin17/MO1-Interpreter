@@ -1,5 +1,5 @@
-package baraco.semantics.analyzers;
-//package LoopsCondStmt.Analyze;
+//package baraco.semantics.analyzers;
+package LoopsCondStmt.Analyze;
 
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser;
@@ -16,6 +16,15 @@ import baraco.semantics.statements.StatementControlOverseer;
 import baraco.semantics.symboltable.scopes.LocalScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
 import baraco.semantics.utils.IdentifiedTokens;
+
+import antlr.Java8Lexer;
+import antlr.Java8Parser;
+import VarAndConstDec.javaValue;
+import VarAndConstDec.javaKeywords;
+import LoopsCondStmt.Stmt.StmtCntrl;
+import symboltable.scope.LocalScope;
+import symboltable.scope.LocalScopeCreator;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -35,11 +44,11 @@ public class LocalVarAnalyze implements ParseTreeListener {
     private boolean executeMappingImmediate = false;
     private boolean hasPassedArrayDeclaration = false;
 
-    public LocalVariableAnalyzer() {
+    public LocalVarAnalyze() {
 
     }
 
-    public void analyze(BaracoParser.LocalVariableDeclarationContext localVarDecCtx) {
+    public void analyze(Java8Parser.LocalVariableDeclarationContext localVarDecCtx) {
         this.identifiedTokens = new IdentifiedTokens();
 
         ParseTreeWalker treeWalker = new ParseTreeWalker();
@@ -71,22 +80,22 @@ public class LocalVarAnalyze implements ParseTreeListener {
 
     private void analyzeVariables(ParserRuleContext ctx) {
 
-        if(ctx instanceof BaracoParser.VariableModifierContext){
-            BaracoParser.VariableModifierContext varModCtx = (BaracoParser.VariableModifierContext) ctx;
+        if(ctx instanceof Java8Parser.VariableModifierContext){
+            Java8Parser.VariableModifierContext varModCtx = (Java8Parser.VariableModifierContext) ctx;
 
-            if (ctx.getTokens(BaracoLexer.FINAL).size() > 0) {
+            if (ctx.getTokens(Java8Lexer.FINAL).size() > 0) {
                 this.identifiedTokens.addToken(FINAL_TYPE_KEY, varModCtx.getText());
             }
 
         }
 
-        if(ctx instanceof BaracoParser.TypeTypeContext) {
-            BaracoParser.TypeTypeContext typeCtx = (BaracoParser.TypeTypeContext) ctx;
+        if(ctx instanceof Java8Parser.TypeTypeContext) {
+            Java8Parser.TypeTypeContext typeCtx = (Java8Parser.TypeTypeContext) ctx;
             //clear tokens for reuse
             //this.identifiedTokens.clearTokens();
 
             if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
-                BaracoParser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
+                Java8Parser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
                 this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, primitiveTypeCtx.getText());
 
             }
@@ -102,8 +111,8 @@ public class LocalVarAnalyze implements ParseTreeListener {
             //this is for class type ctx
             else {
                 //a string identified
-                if(typeCtx.classOrInterfaceType().getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
-                    BaracoParser.ClassOrInterfaceTypeContext classInterfaceCtx = typeCtx.classOrInterfaceType();
+                if(typeCtx.classOrInterfaceType().getText().contains(javaKeywords.PRIMITIVE_TYPE_STRING)) {
+                    Java8Parser.ClassOrInterfaceTypeContext classInterfaceCtx = typeCtx.classOrInterfaceType();
                     this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, classInterfaceCtx.getText());
                 }
             }
@@ -111,9 +120,9 @@ public class LocalVarAnalyze implements ParseTreeListener {
 
         }
 
-        else if(ctx instanceof BaracoParser.VariableDeclaratorContext) {
+        else if(ctx instanceof Java8Parser.VariableDeclaratorContext) {
 
-            BaracoParser.VariableDeclaratorContext varCtx = (BaracoParser.VariableDeclaratorContext) ctx;
+            Java8Parser.VariableDeclaratorContext varCtx = (Java8Parser.VariableDeclaratorContext) ctx;
 
             if(this.hasPassedArrayDeclaration) {
 
@@ -135,7 +144,7 @@ public class LocalVarAnalyze implements ParseTreeListener {
                 if(this.identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY)) {
                     String primitiveTypeString = this.identifiedTokens.getToken(PRIMITIVE_TYPE_KEY);
 
-                    if(primitiveTypeString.contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
+                    if(primitiveTypeString.contains(javaKeywords.PRIMITIVE_TYPE_STRING)) {
                         this.identifiedTokens.addToken(IDENTIFIER_VALUE_KEY, varCtx.variableInitializer().getText());
                     }
                 }
@@ -143,7 +152,7 @@ public class LocalVarAnalyze implements ParseTreeListener {
                 this.processMapping(varCtx);
 
                 LocalScope localScope = LocalScopeCreator.getInstance().getActiveLocalScope();
-                BaracoValue declaredBaracoValue = localScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
+                javaValue declaredBaracoValue = localScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
 
                 //type check the mobivalue
                 TypeChecker typeChecker = new TypeChecker(declaredBaracoValue, varCtx.variableInitializer().expression());
@@ -159,7 +168,7 @@ public class LocalVarAnalyze implements ParseTreeListener {
      * mapping command should be executed immediately to update the value in the symbol table.
      * Otherwise, it proceeds normally.
      */
-    private void processMapping(BaracoParser.VariableDeclaratorContext varCtx) {
+    private void processMapping(Java8Parser.VariableDeclaratorContext varCtx) {
         if(this.executeMappingImmediate) {
             MappingCommand mappingCommand = new MappingCommand(varCtx.variableDeclaratorId().getText(), varCtx.variableInitializer().expression());
             mappingCommand.execute();

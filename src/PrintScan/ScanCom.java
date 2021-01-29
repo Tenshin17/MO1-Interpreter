@@ -1,5 +1,4 @@
-package baraco.execution.commands.simple;
-//package PrintScan
+package PrintScan;
 
 import baraco.antlr.parser.BaracoParser;
 import baraco.builder.ParserHandler;

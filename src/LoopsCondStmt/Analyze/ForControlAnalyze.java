@@ -1,5 +1,5 @@
-package baraco.semantics.analyzers;
-//package LoopsCondStmt.Analyze;
+//package baraco.semantics.analyzers;
+package LoopsCondStmt.Analyze;
 
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.antlr.parser.BaracoParser;
@@ -10,6 +10,11 @@ import baraco.execution.commands.ICommand;
 import baraco.execution.commands.evaluation.AssignmentCommand;
 import baraco.execution.commands.evaluation.ShorthandCommand;
 import baraco.execution.commands.simple.IncDecCommand;
+
+
+import antlr.Java8Parser;
+import antlr.Java8Lexer;
+import Command.ICommand;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -18,15 +23,15 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ForControlAnalyze implements ParseTreeListener {
 
-    private BaracoParser.LocalVariableDeclarationContext localVarDecCtx;
-    private BaracoParser.ExpressionContext exprCtx;
+    private Java8Parser.LocalVariableDeclarationContext localVarDecCtx;
+    private Java8Parser.ExpressionContext exprCtx;
     private ICommand updateCommand;
 
-    public ForControlAnalyzer() {
+    public ForControlAnalyze() {
 
     }
 
-    public void analyze(BaracoParser.ForControlContext forControlCtx) {
+    public void analyze(Java8Parser.ForControlContext forControlCtx) {
 
         //we don't need to walk the expression anymore, therefore, immediately assign it.
         if(forControlCtx.expression() != null) {
@@ -39,8 +44,8 @@ public class ForControlAnalyze implements ParseTreeListener {
 
     public void analyzeForLoop(ParserRuleContext ctx) {
 
-        if(ctx instanceof BaracoParser.ForInitContext) {
-            BaracoParser.ForInitContext forInitCtx = (BaracoParser.ForInitContext) ctx;
+        if(ctx instanceof Java8Parser.ForInitContext) {
+            Java8Parser.ForInitContext forInitCtx = (Java8Parser.ForInitContext) ctx;
 
             this.localVarDecCtx = forInitCtx.localVariableDeclaration();
 

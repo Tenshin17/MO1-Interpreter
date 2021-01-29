@@ -1,5 +1,4 @@
-package java.execution.commands.evaluation;
-//package EvalSimpCompExp;
+package EvalSimpCompExp;
 
 import antlr.Java8Lexer;
 import antlr.Java8Parser;

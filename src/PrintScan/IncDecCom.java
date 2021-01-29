@@ -1,5 +1,4 @@
-package baraco.execution.commands.simple;
-//package PrintScan
+package PrintScan
 import baraco.antlr.lexer.BaracoLexer;
 import baraco.builder.errorcheckers.ConstChecker;
 import baraco.builder.errorcheckers.UndeclaredChecker;

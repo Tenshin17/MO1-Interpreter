@@ -1,13 +1,20 @@
 package baraco.semantics.analyzers;
 //package LoopsCondStmt.Analyze;
 
-import baraco.antlr.lexer.BaracoLexer;
-import baraco.antlr.parser.BaracoParser;
+//import baraco.antlr.lexer.BaracoLexer;
+//import baraco.antlr.parser.BaracoParser;
 import baraco.builder.errorcheckers.ClassNameChecker;
-import baraco.representations.RecognizedKeywords;
-import baraco.semantics.symboltable.SymbolTableManager;
-import baraco.semantics.symboltable.scopes.ClassScope;
+//import baraco.representations.RecognizedKeywords;
+//import baraco.semantics.symboltable.SymbolTableManager;
+//import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.utils.IdentifiedTokens;
+
+
+import antlr.Java8Parser;
+import antlr.Java8Lexer;
+import symboltable.SymbolTableManager;
+import symboltable.scope.ClassScope;
+import VarAndConstDec.javaKeywords;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -29,11 +36,11 @@ public class ClassAnalyze {
     public final static String IDENTIFIER_KEY = "IDENTIFIER_KEY";
     public final static String IDENTIFIER_VALUE_KEY = "IDENTIFIER_VALUE_KEY";
 
-    public ClassAnalyzer() {
+    public ClassAnalyze() {
 
     }
 
-    public void analyze(BaracoParser.ClassDeclarationContext ctx) {
+    public void analyze(Java8Parser.ClassDeclarationContext ctx) {
         String className = ctx.Identifier().getText();
 
         System.out.println("Class name is " +className);
@@ -49,21 +56,21 @@ public class ClassAnalyze {
 
     //TODO: Discontinued OOP method
     private void analyzeClassMembers(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.ClassOrInterfaceModifierContext) {
-            BaracoParser.ClassOrInterfaceModifierContext classModifierCtx = (BaracoParser.ClassOrInterfaceModifierContext) ctx;
+        if(ctx instanceof Java8Parser.ClassOrInterfaceModifierContext) {
+            Java8Parser.ClassOrInterfaceModifierContext classModifierCtx = (Java8Parser.ClassOrInterfaceModifierContext) ctx;
 
             this.analyzeModifier(classModifierCtx);
         }
 
-        else if(ctx instanceof BaracoParser.FieldDeclarationContext) {
-            BaracoParser.FieldDeclarationContext fieldCtx = (BaracoParser.FieldDeclarationContext) ctx;
+        else if(ctx instanceof Java8Parser.FieldDeclarationContext) {
+            Java8Parser.FieldDeclarationContext fieldCtx = (Java8Parser.FieldDeclarationContext) ctx;
 
             if(fieldCtx.typeType() != null) {
-                BaracoParser.TypeTypeContext typeCtx = fieldCtx.typeType();
+                Java8Parser.TypeTypeContext typeCtx = fieldCtx.typeType();
 
                 //check if its a primitive type
                 if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
-                    BaracoParser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
+                    Java8Parser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
                     this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, primitiveTypeCtx.getText());
 
                     //create a field analyzer to walk through declarations
@@ -85,8 +92,8 @@ public class ClassAnalyze {
                 else {
 
                     //a string identified
-                    if(typeCtx.classOrInterfaceType().getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
-                        BaracoParser.ClassOrInterfaceTypeContext classInterfaceCtx = typeCtx.classOrInterfaceType();
+                    if(typeCtx.classOrInterfaceType().getText().contains(javaKeywords.PRIMITIVE_TYPE_STRING)) {
+                        Java8Parser.ClassOrInterfaceTypeContext classInterfaceCtx = typeCtx.classOrInterfaceType();
                         this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, classInterfaceCtx.getText());
                     }
 
@@ -101,7 +108,7 @@ public class ClassAnalyze {
         }
 
         else if(ctx instanceof BaracoParser.MethodDeclarationContext) {
-            BaracoParser.MethodDeclarationContext methodDecCtx = (BaracoParser.MethodDeclarationContext) ctx;
+            Java8Parser.MethodDeclarationContext methodDecCtx = (Java8Parser.MethodDeclarationContext) ctx;
             OOPMethodAnalyzer methodAnalyzer = new OOPMethodAnalyzer(this.identifiedTokens, this.declaredClassScope);
             methodAnalyzer.analyze(methodDecCtx);
 
@@ -110,10 +117,10 @@ public class ClassAnalyze {
         }
     }
 
-    public static boolean isPrimitiveDeclaration(BaracoParser.TypeTypeContext typeCtx) {
+    public static boolean isPrimitiveDeclaration(Java8Parser.TypeTypeContext typeCtx) {
         if(typeCtx.primitiveType() != null) {
-            List<TerminalNode> lBrackToken = typeCtx.getTokens(BaracoLexer.LBRACK);
-            List<TerminalNode> rBrackToken = typeCtx.getTokens(BaracoLexer.RBRACK);
+            List<TerminalNode> lBrackToken = typeCtx.getTokens(Java8Lexer.LBRACK);
+            List<TerminalNode> rBrackToken = typeCtx.getTokens(Java8Lexer.RBRACK);
 
             return (lBrackToken.size() == 0 && rBrackToken.size() == 0);
         }
@@ -121,10 +128,10 @@ public class ClassAnalyze {
         return false;
     }
 
-    public static boolean isPrimitiveArrayDeclaration(BaracoParser.TypeTypeContext typeCtx) {
+    public static boolean isPrimitiveArrayDeclaration(Java8Parser.TypeTypeContext typeCtx) {
         if(typeCtx.primitiveType() != null) {
-            List<TerminalNode> lBrackToken = typeCtx.getTokens(BaracoLexer.LBRACK);
-            List<TerminalNode> rBrackToken = typeCtx.getTokens(BaracoLexer.RBRACK);
+            List<TerminalNode> lBrackToken = typeCtx.getTokens(Java8Lexer.LBRACK);
+            List<TerminalNode> rBrackToken = typeCtx.getTokens(Java8Lexer.RBRACK);
 
             return (lBrackToken.size() > 0 && rBrackToken.size() > 0);
         }
@@ -132,17 +139,17 @@ public class ClassAnalyze {
         return false;
     }
 
-    private void analyzeModifier(BaracoParser.ClassOrInterfaceModifierContext ctx) {
-        if(ctx.getTokens(BaracoLexer.PUBLIC).size() > 0 || ctx.getTokens(BaracoLexer.PRIVATE).size() > 0
-                || ctx.getTokens(BaracoLexer.PROTECTED).size() > 0) {
+    private void analyzeModifier(Java8Parser.ClassOrInterfaceModifierContext ctx) {
+        if(ctx.getTokens(Java8Lexer.PUBLIC).size() > 0 || ctx.getTokens(Java8Lexer.PRIVATE).size() > 0
+                || ctx.getTokens(Java8Lexer.PROTECTED).size() > 0) {
             //Console.log(LogType.DEBUG, "Detected accessor: " +ctx.getText());
             this.identifiedTokens.addToken(ACCESS_CONTROL_KEY, ctx.getText());
         }
-        else if(ctx.getTokens(BaracoLexer.FINAL).size() > 0) {
+        else if(ctx.getTokens(Java8Lexer.FINAL).size() > 0) {
             //Console.log(LogType.DEBUG, "Detected const: " +ctx.getText());
             this.identifiedTokens.addToken(CONST_CONTROL_KEY, ctx.getText());
         }
-        else if(ctx.getTokens(BaracoLexer.STATIC).size() > 0) {
+        else if(ctx.getTokens(Java8Lexer.STATIC).size() > 0) {
             //Console.log(LogType.DEBUG, "Detected static: " +ctx.getText());
             this.identifiedTokens.addToken(STATIC_CONTROL_KEY, ctx.getText());
         }

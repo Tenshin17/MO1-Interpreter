@@ -10,6 +10,12 @@ import baraco.representations.BaracoValue;
 import baraco.representations.RecognizedKeywords;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.utils.IdentifiedTokens;
+
+
+import antlr.Java8Parser;
+import VarAndConstDec.javaValue;
+import VarAndConstDec.javaKeywords;
+import symboltable.scope.ClassScope;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -26,7 +32,7 @@ public class FieldAnalyze implements ParseTreeListener {
         this.declaredClassScope = declaredClassScope;
     }
 
-    public void analyze(BaracoParser.VariableDeclaratorsContext varDecCtxList) {
+    public void analyze(Java8Parser.VariableDeclaratorsContext varDecCtxList) {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, varDecCtxList);
     }
@@ -45,8 +51,8 @@ public class FieldAnalyze implements ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.VariableDeclaratorContext) {
-            BaracoParser.VariableDeclaratorContext varCtx = (BaracoParser.VariableDeclaratorContext) ctx;
+        if(ctx instanceof Java8Parser.VariableDeclaratorContext) {
+            Java8Parser.VariableDeclaratorContext varCtx = (Java8Parser.VariableDeclaratorContext) ctx;
 
             //check for duplicate declarations
             MultipleVariableDeclarationChecker multipleDeclaredChecker = new MultipleVariableDeclarationChecker(varCtx.variableDeclaratorId());
@@ -69,7 +75,7 @@ public class FieldAnalyze implements ParseTreeListener {
                 MappingCommand mappingCommand = new MappingCommand(varCtx.variableDeclaratorId().getText(), varCtx.variableInitializer().expression());
                 ExecutionManager.getInstance().addCommand(mappingCommand);
 
-                BaracoValue declaredBaracoValue = this.declaredClassScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
+                javaValue declaredBaracoValue = this.declaredClassScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
 
                 //type check the mobivalue
                 TypeChecker typeChecker = new TypeChecker(declaredBaracoValue, varCtx.variableInitializer().expression());
@@ -107,7 +113,7 @@ public class FieldAnalyze implements ParseTreeListener {
                 this.declaredClassScope.addEmptyVariableFromKeywords(classModifierString, primitiveTypeString, identifierString);
             }
 
-            BaracoValue declaredValue = this.declaredClassScope.searchVariableIncludingLocal(identifierString);
+            javaValue declaredValue = this.declaredClassScope.searchVariableIncludingLocal(identifierString);
             //verify if the declared variable is a constant
             if(this.identifiedTokens.containsTokens(ClassAnalyzer.CONST_CONTROL_KEY)) {
                 declaredValue.markFinal();

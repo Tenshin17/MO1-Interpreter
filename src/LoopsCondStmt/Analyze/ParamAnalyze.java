@@ -1,6 +1,4 @@
-package baraco.semantics.analyzers;
-//package LoopsCondStmt.Analyze;
-//package LoopsCondStmt.Analyze;
+package LoopsCondStmt.Analyze;
 
 import baraco.antlr.parser.BaracoParser;
 import baraco.representations.BaracoArray;
@@ -8,6 +6,12 @@ import baraco.representations.BaracoMethod;
 import baraco.representations.BaracoValue;
 import baraco.representations.RecognizedKeywords;
 import baraco.semantics.utils.IdentifiedTokens;
+
+import antlr.Java8Parser;
+import VarAndConstDec.javaArray;
+import VarAndConstDec.javaMethod;
+import VarAndConstDec.javaValue;
+import VarAndConstDec.javaKeywords;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -22,13 +26,13 @@ public class ParamAnalyze implements ParseTreeListener {
 
 
     private IdentifiedTokens identifiedTokens;
-    private BaracoMethod declaredBaracoMethod;
+    private javaMethod declaredBaracoMethod;
 
-    public ParameterAnalyzer(BaracoMethod declaredBaracoMethod) {
+    public ParamAnalyze(javaMethod declaredBaracoMethod) {
         this.declaredBaracoMethod = declaredBaracoMethod;
     }
 
-    public void analyze(BaracoParser.FormalParameterListContext ctx) {
+    public void analyze(Java8Parser.FormalParameterListContext ctx) {
         this.identifiedTokens = new IdentifiedTokens();
 
         ParseTreeWalker treeWalker = new ParseTreeWalker();
@@ -58,8 +62,8 @@ public class ParamAnalyze implements ParseTreeListener {
      */
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.FormalParameterContext) {
-            BaracoParser.FormalParameterContext formalParamCtx = (BaracoParser.FormalParameterContext) ctx;
+        if(ctx instanceof Java8Parser.FormalParameterContext) {
+            Java8Parser.FormalParameterContext formalParamCtx = (Java8Parser.FormalParameterContext) ctx;
             this.analyzeParameter(formalParamCtx);
         }
     }
@@ -73,18 +77,18 @@ public class ParamAnalyze implements ParseTreeListener {
 
     }
 
-    private void analyzeParameter(BaracoParser.FormalParameterContext formalParamCtx) {
+    private void analyzeParameter(Java8Parser.FormalParameterContext formalParamCtx) {
         if(formalParamCtx.typeType() != null) {
-            BaracoParser.TypeTypeContext typeCtx = formalParamCtx.typeType();
+            Java8Parser.TypeTypeContext typeCtx = formalParamCtx.typeType();
 
             //return type is a primitive type
             if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
-                BaracoParser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
+                Java8Parser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
                 this.identifiedTokens.addToken(PARAMETER_TYPE_KEY, primitiveTypeCtx.getText());
             }
             //check if its array declaration
             else if(ClassAnalyzer.isPrimitiveArrayDeclaration(typeCtx)) {
-                BaracoParser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
+                Java8Parser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
                 this.identifiedTokens.addToken(PARAMETER_TYPE_KEY, primitiveTypeCtx.getText());
                 this.identifiedTokens.addToken(IS_ARRAY_KEY, IS_ARRAY_KEY);
             }
@@ -92,7 +96,7 @@ public class ParamAnalyze implements ParseTreeListener {
             //return type is a string or a class type
             else {
                 //a string type
-                if(typeCtx.classOrInterfaceType().getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
+                if(typeCtx.classOrInterfaceType().getText().contains(javaKeywords.PRIMITIVE_TYPE_STRING)) {
                     this.identifiedTokens.addToken(PARAMETER_TYPE_KEY, typeCtx.classOrInterfaceType().getText());
                 }
             }
@@ -113,8 +117,8 @@ public class ParamAnalyze implements ParseTreeListener {
             String identifierString = this.identifiedTokens.getToken(PARAMETER_IDENTIFIER_KEY);
 
             //initialize an array mobivalue
-            BaracoArray declaredArray = BaracoArray.createArray(typeString, identifierString);
-            BaracoValue mobiValue = new BaracoValue(declaredArray, BaracoValue.PrimitiveType.ARRAY);
+            javaArray declaredArray = javaArray.createArray(typeString, identifierString);
+            javaValue mobiValue = new javaValue(declaredArray, javaValue.PrimitiveType.ARRAY);
             this.declaredBaracoMethod.addParameter(identifierString, mobiValue);
 
             //Console.log(LogType.DEBUG, "Created array parameter for " +this.declaredBaracoMethod.getFunctionName());
@@ -123,7 +127,7 @@ public class ParamAnalyze implements ParseTreeListener {
             String typeString = this.identifiedTokens.getToken(PARAMETER_TYPE_KEY);
             String identifierString = this.identifiedTokens.getToken(PARAMETER_IDENTIFIER_KEY);
 
-            BaracoValue mobiValue = BaracoValue.createEmptyVariableFromKeywords(typeString);
+            javaValue mobiValue = javaValue.createEmptyVariableFromKeywords(typeString);
             this.declaredBaracoMethod.addParameter(identifierString, mobiValue);
         }
 

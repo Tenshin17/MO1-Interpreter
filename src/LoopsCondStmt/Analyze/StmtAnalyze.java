@@ -1,26 +1,36 @@
-package baraco.semantics.analyzers;
-//package LoopsCondStmt.Analyze;
+package LoopsCondStmt.Analyze;
 
-import baraco.antlr.lexer.BaracoLexer;
+import baraco.antlr.lexer.Java8Lexer;
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.builder.ParserHandler;
 import baraco.execution.ExecutionManager;
 import baraco.execution.commands.controlled.*;
 import baraco.execution.commands.simple.PrintCommand;
-import baraco.execution.commands.simple.ReturnCommand;
+import baraco.execution.commands.simple.ReturnCom;
 import baraco.execution.commands.simple.ScanCommand;
 import baraco.representations.BaracoMethod;
-import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.statements.StmtCntrl;
 import baraco.semantics.symboltable.SymbolTableManager;
 import baraco.semantics.symboltable.scopes.ClassScope;
 import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+
+
+import antlr.*;
+import PrintScan.PrintCom;
+import PrintScan.ReturnCom;
+import PrintScan.ScanCom;
+import VarAndConstDec.javaMethod;
+import LoopsCondStmt.Stmt.StmtCntrl;
+import symboltable.SymbolTableManager;
+import symboltable.scope.ClassScope;
+import symboltable.scope.LocalScopeCreator;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 
 public class StmtAnalyze {
 
-    public StatementAnalyzer() {
+    public StmtAnalyze() {
 
     }
 
@@ -37,7 +47,7 @@ public class StmtAnalyze {
         //an expression
         else if(ctx.statementExpression() != null) {
             System.out.println("STATEMENT ANALYZER: " + ctx.statementExpression().expression().start.getText());
-            StatementExpressionAnalyzer expressionAnalyzer = new StatementExpressionAnalyzer();
+            StmtExprAnalyze expressionAnalyzer = new StmtExprAnalyze();
             expressionAnalyzer.analyze(ctx.statementExpression());
         }
 
@@ -47,31 +57,31 @@ public class StmtAnalyze {
             BlockContext blockContext = ctx.block();
 
             TryCommand tryCommand = new TryCommand();
-            StatementControlOverseer.getInstance().openAttemptCommand(tryCommand);
+            StmtCntrl.getInstance().openAttemptCommand(tryCommand);
 
-            BlockAnalyzer tryBlockAnalyzer = new BlockAnalyzer();
+            BlockAnalyze tryBlockAnalyzer = new BlockAnalyze();
             tryBlockAnalyzer.analyze(blockContext);
 
-            StatementControlOverseer.getInstance().reportExitTryBlock();
+            StmtCntrl.getInstance().reportExitTryBlock();
 
             // loop through catch clauses available
             for (CatchClauseContext cCContext:
                     ctx.catchClause()) {
 
-                StatementControlOverseer.getInstance().setCurrentCatchClause(determineCatchType(cCContext.catchType()));
+                StmtCntrl.getInstance().setCurrentCatchClause(determineCatchType(cCContext.catchType()));
 
-                BlockAnalyzer catchBlockAnalyzer = new BlockAnalyzer();
+                BlockAnalyze catchBlockAnalyzer = new BlockAnalyze();
                 catchBlockAnalyzer.analyze(cCContext.block());
 
             }
 
-            StatementControlOverseer.getInstance().compileControlledCommand();
-            StatementControlOverseer.getInstance().setCurrentCatchClause(null);
+            StmtCntrl.getInstance().compileControlledCommand();
+            StmtCntrl.getInstance().setCurrentCatchClause(null);
         }
         else if(ctx.block() != null) {
             BlockContext blockCtx = ctx.block();
 
-            BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
+            BlockAnalyze blockAnalyzer = new BlockAnalyze();
             blockAnalyzer.analyze(blockCtx);
         }
         else if(isIFStatement(ctx)) {
@@ -82,12 +92,12 @@ public class StmtAnalyze {
             //Console.log(LogType.DEBUG, "IF statement: " +statementCtx.getText());
 
             IfCommand ifCommand = new IfCommand(ctx.parExpression());
-            StatementControlOverseer.getInstance().openConditionalCommand(ifCommand);
+            StmtCntrl.getInstance().openConditionalCommand(ifCommand);
 
-            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            StmtAnalyze statementAnalyzer = new StmtAnalyze();
             statementAnalyzer.analyze(statementCtx);
 
-            StatementControlOverseer.getInstance().reportExitPositiveRule();
+            StmtCntrl.getInstance().reportExitPositiveRule();
 
             //check if there is an ELSE statement
             if (isELSEStatement(ctx)) {
@@ -97,24 +107,24 @@ public class StmtAnalyze {
                 statementAnalyzer.analyze(statementCtx);
             }
 
-            StatementControlOverseer.getInstance().compileControlledCommand();
+            StmtCntrl.getInstance().compileControlledCommand();
         }
         else if(isFORStatement(ctx)) {
             System.out.println("FOR expression: " +ctx.forControl().getText());
 
             LocalScopeCreator.getInstance().openLocalScope();
 
-            ForControlAnalyzer forControlAnalyzer = new ForControlAnalyzer();
+            ForControlAnalyze forControlAnalyzer = new ForControlAnalyze();
             forControlAnalyzer.analyze(ctx.forControl());
 
             ForCommand forCommand = new ForCommand(forControlAnalyzer.getLocalVarDecContext(), forControlAnalyzer.getExprContext(), forControlAnalyzer.getUpdateCommand());
-            StatementControlOverseer.getInstance().openControlledCommand(forCommand);
+            StmtCntrl.getInstance().openControlledCommand(forCommand);
 
             StatementContext statementCtx = ctx.statement(0);
-            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            StmtExprAnalyze statementAnalyzer = new StmtExprAnalyze();
             statementAnalyzer.analyze(statementCtx);
 
-            StatementControlOverseer.getInstance().compileControlledCommand();
+            StmtCntrl.getInstance().compileControlledCommand();
 
             LocalScopeCreator.getInstance().closeLocalScope();
             System.out.println("End of FOR loop");
@@ -125,12 +135,12 @@ public class StmtAnalyze {
             StatementContext statementCtx = ctx.statement(0);
 
             WhileCommand whileCommand = new WhileCommand(ctx.parExpression());
-            StatementControlOverseer.getInstance().openControlledCommand(whileCommand);
+            StmtCntrl.getInstance().openControlledCommand(whileCommand);
 
-            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            StmtAnalyze statementAnalyzer = new StmtAnalyze();
             statementAnalyzer.analyze(statementCtx);
 
-            StatementControlOverseer.getInstance().compileControlledCommand();
+            StmtCntrl.getInstance().compileControlledCommand();
             //Console.log(LogType.DEBUG, "End of WHILE expression: " +ctx.parExpression().getText());
         }
         else if(isDOWHILEStatement(ctx)) {
@@ -139,12 +149,12 @@ public class StmtAnalyze {
             StatementContext statementCtx = ctx.statement(0);
 
             DoWhileCommand doWhileCommand = new DoWhileCommand(ctx.parExpression());
-            StatementControlOverseer.getInstance().openControlledCommand(doWhileCommand);
+            StmtCntrl.getInstance().openControlledCommand(doWhileCommand);
 
-            StatementAnalyzer statementAnalyzer = new StatementAnalyzer();
+            StmtAnalyze statementAnalyzer = new StmtAnalyze();
             statementAnalyzer.analyze(statementCtx);
 
-            StatementControlOverseer.getInstance().compileControlledCommand();
+            StmtCntrl.getInstance().compileControlledCommand();
             //Console.log(LogType.DEBUG, "End of DO-WHILE expression: " +ctx.parExpression().getText());
         }
         else if(isRETURNStatement(ctx) && ExecutionManager.getInstance().isInFunctionExecution()) {
@@ -158,7 +168,7 @@ public class StmtAnalyze {
 
         PrintCommand printCommand = new PrintCommand(ctx);
 
-        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+        StmtCntrl statementControl = StmtCntrl.getInstance();
         //add to conditional controlled command
         if(statementControl.isInConditionalCommand()) {
             IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
@@ -199,7 +209,7 @@ public class StmtAnalyze {
         else
             scanCommand = new ScanCommand(ctx.expression(0).getText(), ctx.Identifier().getText());
 
-        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+        StmtCntrl statementControl = StmtCntrl.getInstance();
 
         if(statementControl.isInConditionalCommand()) {
             IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
@@ -232,12 +242,12 @@ public class StmtAnalyze {
     }
 
     private void handleReturnStatement(ExpressionContext exprCtx) {
-        ReturnCommand returnCommand = new ReturnCommand(exprCtx, ExecutionManager.getInstance().getCurrentFunction());
+        ReturnCom returnCommand = new ReturnCom(exprCtx, ExecutionManager.getInstance().getCurrentFunction());
         /*
          * TODO: Return commands supposedly stops a controlled or conditional command and returns back the control to the caller.
          * Find a way to halt such commands if they are inside a controlled command.
          */
-        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+        StmtCntrl statementControl = StmtCntrl.getInstance();
 
         if(statementControl.isInConditionalCommand()) {
             IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
@@ -274,29 +284,29 @@ public class StmtAnalyze {
     }
 
     public static boolean isTRYStatement(StatementContext ctx) {
-        List<TerminalNode> tryTokenList = ctx.getTokens(BaracoLexer.TRY);
+        List<TerminalNode> tryTokenList = ctx.getTokens(Java8Lexer.TRY);
 
         return (tryTokenList.size() != 0);
     }
     /*
         public static boolean isCATCHStatement(StatementContext ctx) {
-            List<TerminalNode> catchTokenList = ctx.getTokens(BaracoLexer.CATCH);
+            List<TerminalNode> catchTokenList = ctx.getTokens(Java8Lexer.CATCH);
 
             return (catchTokenList.size() != 0);
         }
 
         public static boolean isFINALLYStatement(StatementContext ctx) {
-            List<TerminalNode> finallyTokenList = ctx.getTokens(BaracoLexer.FINALLY);
+            List<TerminalNode> finallyTokenList = ctx.getTokens(Java8Lexer.FINALLY);
 
             return (finallyTokenList.size() != 0);
         }
         */
     public static IAttemptCommand.CatchTypeEnum determineCatchType(CatchTypeContext ctx) {
-        if (ctx.getTokens(BaracoLexer.ARITHMETIC_EXCEPTION).size() > 0) {
+        if (ctx.getTokens(Java8Lexer.ARITHMETIC_EXCEPTION).size() > 0) {
             return IAttemptCommand.CatchTypeEnum.ARITHMETIC_EXCEPTION;
-        } else if (ctx.getTokens(BaracoLexer.ARRAY_BOUNDS_EXCEPTION).size() > 0) {
+        } else if (ctx.getTokens(Java8Lexer.ARRAY_BOUNDS_EXCEPTION).size() > 0) {
             return IAttemptCommand.CatchTypeEnum.ARRAY_OUT_OF_BOUNDS;
-        } else if (ctx.getTokens(BaracoLexer.NEGATIVE_ARRSIZE_EXCEPTION).size() > 0) {
+        } else if (ctx.getTokens(Java8Lexer.NEGATIVE_ARRSIZE_EXCEPTION).size() > 0) {
             return IAttemptCommand.CatchTypeEnum.NEGATIVE_ARRAY_SIZE;
         }
 
@@ -304,38 +314,38 @@ public class StmtAnalyze {
     }
 
     public static boolean isFORStatement(StatementContext ctx) {
-        List<TerminalNode> forTokenList = ctx.getTokens(BaracoLexer.FOR);
+        List<TerminalNode> forTokenList = ctx.getTokens(Java8Lexer.FOR);
 
         return (forTokenList.size() != 0);
     }
 
     public static boolean isIFStatement(StatementContext ctx) {
-        List<TerminalNode> tokenList = ctx.getTokens(BaracoLexer.IF);
+        List<TerminalNode> tokenList = ctx.getTokens(Java8Lexer.IF);
 
         return (tokenList.size() != 0);
     }
 
     public static boolean isELSEStatement(StatementContext ctx) {
-        List<TerminalNode> tokenList = ctx.getTokens(BaracoLexer.ELSE);
+        List<TerminalNode> tokenList = ctx.getTokens(Java8Lexer.ELSE);
 
         return (tokenList.size() != 0);
     }
 
     public static boolean isWHILEStatement(StatementContext ctx) {
-        List<TerminalNode> whileTokenList = ctx.getTokens(BaracoLexer.WHILE);
-        List<TerminalNode> doTokenList = ctx.getTokens(BaracoLexer.DO);
+        List<TerminalNode> whileTokenList = ctx.getTokens(Java8Lexer.WHILE);
+        List<TerminalNode> doTokenList = ctx.getTokens(Java8Lexer.DO);
 
         return (whileTokenList.size() != 0 && doTokenList.size() == 0);
     }
 
     public static boolean isDOWHILEStatement(StatementContext ctx) {
-        List<TerminalNode> whileTokenList = ctx.getTokens(BaracoLexer.WHILE);
-        List<TerminalNode> doTokenList = ctx.getTokens(BaracoLexer.DO);
+        List<TerminalNode> whileTokenList = ctx.getTokens(Java8Lexer.WHILE);
+        List<TerminalNode> doTokenList = ctx.getTokens(Java8Lexer.DO);
 
         return (whileTokenList.size() != 0 && doTokenList.size() != 0);
     }
     public static boolean isRETURNStatement(StatementContext ctx) {
-        List<TerminalNode> returnTokenList = ctx.getTokens(BaracoLexer.RETURN);
+        List<TerminalNode> returnTokenList = ctx.getTokens(Java8Lexer.RETURN);
 
         return (returnTokenList.size() != 0);
     }

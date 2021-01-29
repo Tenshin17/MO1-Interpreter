@@ -1,7 +1,6 @@
-package baraco.semantics.analyzers;
-//package LoopsCondStmt.Analyze;
+package LoopsCondStmt.Analyze;
 
-import baraco.antlr.lexer.BaracoLexer;
+import baraco.antlr.lexer.Java8Lexer;
 import baraco.antlr.parser.BaracoParser.*;
 import baraco.builder.BuildChecker;
 import baraco.builder.ErrorRepository;
@@ -9,14 +8,23 @@ import baraco.execution.ExecutionManager;
 import baraco.execution.commands.EvaluationCommand;
 import baraco.execution.commands.ICommand;
 import baraco.execution.commands.controlled.IAttemptCommand;
-import baraco.execution.commands.controlled.IConditionalCommand;
-import baraco.execution.commands.controlled.IControlledCommand;
-import baraco.execution.commands.evaluation.AssignmentCommand;
-import baraco.execution.commands.evaluation.ShorthandCommand;
-import baraco.execution.commands.simple.IncDecCommand;
+import baraco.execution.commands.controlled.ICondCommand;
+import baraco.execution.commands.controlled.ICtrlCommand;
+import baraco.execution.commands.evaluation.AssignCom;
+import baraco.execution.commands.evaluation.ShortCom;
+import baraco.execution.commands.simple.IncDecCom;
 import baraco.execution.commands.simple.MethodCallCommand;
-import baraco.semantics.statements.StatementControlOverseer;
+import baraco.semantics.statements.StmtCntrl;
 import baraco.semantics.utils.Expression;
+
+import antlr.*;
+import Command.ICommand;
+import Command.ICtrlCommand;
+import Command.ICondCommand;
+import EvalSimpCompExp.AssignCom;
+import EvalSimpCompExp.ShortCom;
+import PrintScan.IncDecCom;
+import LoopsCondStmt.Stmt.StmtCntrl;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -34,7 +42,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
     public final static int FUNCTION_CALL_NO_PARAMS_DEPTH = 13;
     public final static int FUNCTION_CALL_WITH_PARAMS_DEPTH = 14;
 
-    public StatementExpressionAnalyzer() {
+    public StmtExprAnalyze() {
 
     }
 
@@ -69,7 +77,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
                 System.out.println("Assignment expr detected: " +exprCtx.getText());
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
-                AssignmentCommand assignmentCommand = new AssignmentCommand(exprListCtx.get(0), exprListCtx.get(1));
+                AssignCom assignmentCommand = new AssignCom(exprListCtx.get(0), exprListCtx.get(1));
 
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(assignmentCommand);
@@ -79,7 +87,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
                 System.out.println("Add assign expr detected: " + exprCtx.getText());
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
-                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.ADD_ASSIGN);
+                ShortCom shorthandCommand = new ShortCom(exprListCtx.get(0), exprListCtx.get(1), Java8Lexer.ADD_ASSIGN);
 
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(shorthandCommand);
@@ -88,7 +96,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
                 System.out.println("Sub assign expr detected: " + exprCtx.getText());
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
-                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.SUB_ASSIGN);
+                ShortCom shorthandCommand = new ShortCom(exprListCtx.get(0), exprListCtx.get(1), Java8Lexer.SUB_ASSIGN);
 
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(shorthandCommand);
@@ -97,7 +105,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
                 System.out.println("Mul assign expr detected: " + exprCtx.getText());
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
-                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.MUL_ASSIGN);
+                ShortCom shorthandCommand = new ShortCom(exprListCtx.get(0), exprListCtx.get(1), Java8Lexer.MUL_ASSIGN);
 
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(shorthandCommand);
@@ -106,7 +114,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
                 System.out.println("Div assign expr detected: " + exprCtx.getText());
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
-                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.DIV_ASSIGN);
+                ShortCom shorthandCommand = new ShortCom(exprListCtx.get(0), exprListCtx.get(1), Java8Lexer.DIV_ASSIGN);
 
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(shorthandCommand);
@@ -115,7 +123,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
                 System.out.println("Mod assign expr detected: " + exprCtx.getText());
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
-                ShorthandCommand shorthandCommand = new ShorthandCommand(exprListCtx.get(0), exprListCtx.get(1), BaracoLexer.MOD_ASSIGN);
+                ShortCom shorthandCommand = new ShortCom(exprListCtx.get(0), exprListCtx.get(1), Java8Lexer.MOD_ASSIGN);
 
                 this.readRightHandExprCtx = exprListCtx.get(1);
                 this.handleStatementExecution(shorthandCommand);
@@ -125,7 +133,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
 
-                IncDecCommand incDecCommand = new IncDecCommand(exprListCtx.get(0), BaracoLexer.INC);
+                IncDecCom incDecCommand = new IncDecCom(exprListCtx.get(0), Java8Lexer.INC);
                 this.handleStatementExecution(incDecCommand);
             }
 
@@ -134,7 +142,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
 
                 List<ExpressionContext> exprListCtx = exprCtx.expression();
 
-                IncDecCommand incDecCommand = new IncDecCommand(exprListCtx.get(0), BaracoLexer.DEC);
+                IncDecCom incDecCommand = new IncDecCom(exprListCtx.get(0), Java8Lexer.DEC);
                 this.handleStatementExecution(incDecCommand);
 
             }
@@ -198,11 +206,11 @@ public class StmtExprAnalyze implements ParseTreeListener {
 
     private void handleStatementExecution(ICommand command) {
 
-        StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+        StmtCntrl statementControl = StmtCntrl.getInstance();
 
         //add to conditional controlled command
         if(statementControl.isInConditionalCommand()) {
-            IConditionalCommand conditionalCommand = (IConditionalCommand) statementControl.getActiveControlledCommand();
+            ICondCommand conditionalCommand = (ICondCommand) statementControl.getActiveControlledCommand();
 
             if(statementControl.isInPositiveRule()) {
                 conditionalCommand.addPositiveCommand(command);
@@ -213,7 +221,7 @@ public class StmtExprAnalyze implements ParseTreeListener {
         }
 
         else if(statementControl.isInControlledCommand()) {
-            IControlledCommand controlledCommand = (IControlledCommand) statementControl.getActiveControlledCommand();
+            ICtrlCommand controlledCommand = (ICtrlCommand) statementControl.getActiveControlledCommand();
             controlledCommand.addCommand(command);
         }
         else if (statementControl.isInAttemptCommand()) {
@@ -261,49 +269,49 @@ public class StmtExprAnalyze implements ParseTreeListener {
     }
 
     public static boolean isAssignmentExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.ASSIGN);
+        List<TerminalNode> tokenList = exprCtx.getTokens(Java8Lexer.ASSIGN);
 
         return (tokenList.size() > 0);
     }
 
     public static boolean isAddAssignExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.ADD_ASSIGN);
+        List<TerminalNode> tokenList = exprCtx.getTokens(Java8Lexer.ADD_ASSIGN);
 
         return (tokenList.size() > 0);
     }
 
     public static boolean isSubAssignExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.SUB_ASSIGN);
+        List<TerminalNode> tokenList = exprCtx.getTokens(Java8Lexer.SUB_ASSIGN);
 
         return (tokenList.size() > 0);
     }
 
     public static boolean isMulAssignExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.MUL_ASSIGN);
+        List<TerminalNode> tokenList = exprCtx.getTokens(Java8Lexer.MUL_ASSIGN);
 
         return (tokenList.size() > 0);
     }
 
     public static boolean isDivAssignExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.DIV_ASSIGN);
+        List<TerminalNode> tokenList = exprCtx.getTokens(Java8Lexer.DIV_ASSIGN);
 
         return (tokenList.size() > 0);
     }
 
     public static boolean isModAssignExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> tokenList = exprCtx.getTokens(BaracoLexer.MOD_ASSIGN);
+        List<TerminalNode> tokenList = exprCtx.getTokens(Java8Lexer.MOD_ASSIGN);
 
         return (tokenList.size() > 0);
     }
 
     public static boolean isIncrementExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> incrementList = exprCtx.getTokens(BaracoLexer.INC);
+        List<TerminalNode> incrementList = exprCtx.getTokens(Java8Lexer.INC);
 
         return (incrementList.size() > 0);
     }
 
     public static boolean isDecrementExpression(ExpressionContext exprCtx) {
-        List<TerminalNode> decrementList = exprCtx.getTokens(BaracoLexer.DEC);
+        List<TerminalNode> decrementList = exprCtx.getTokens(Java8Lexer.DEC);
 
         return (decrementList.size() > 0);
     }

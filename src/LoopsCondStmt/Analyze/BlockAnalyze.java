@@ -1,14 +1,16 @@
-package baraco.semantics.analyzers;
-//package LoopsCondStmt.Analyze;
+//package baraco.semantics.analyzers;
+package LoopsCondStmt.Analyze;
 
-import baraco.semantics.symboltable.scopes.LocalScopeCreator;
-import baraco.antlr.parser.BaracoParser.*;
+//import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+//import baraco.antlr.parser.BaracoParser.*;
+import antlr.*;
+import symboltable.scope.LocalScopeCreator;
 
 import java.util.List;
 
 public class BlockAnalyze {
 
-    public BlockAnalyzer() {
+    public BlockAnalyze() {
         LocalScopeCreator.getInstance().openLocalScope();
     }
 

@@ -6,32 +6,42 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import VarAndConstDec.javaMethod;
+import VarAndConstDec.javaKeywords;
+import symboltable.scope.ClassScope;
+import symboltable.scope.LocalScopeCreator;
+import symboltable.SymbolTableManager;
+import antlr.Java8Parser;
 
-import baraco.antlr.parser.BaracoParser;
-import baraco.builder.BuildChecker;
-import baraco.builder.ErrorRepository;
-import baraco.builder.errorcheckers.MultipleMethodDeclarationChecker;
-import baraco.execution.ExecutionManager;
-import baraco.representations.BaracoMethod;
-import baraco.representations.RecognizedKeywords;
-import baraco.semantics.symboltable.SymbolTableManager;
-import baraco.semantics.symboltable.scopes.ClassScope;
-import baraco.semantics.symboltable.scopes.LocalScopeCreator;
-import baraco.semantics.utils.IdentifiedTokens;
+
+//import baraco.antlr.parser.BaracoParser;
+//import baraco.builder.BuildChecker;
+//import baraco.builder.ErrorRepository;
+//import baraco.builder.errorcheckers.MultipleMethodDeclarationChecker;
+//import baraco.execution.ExecutionManager;
+//import baraco.representations.BaracoMethod;
+//import baraco.representations.RecognizedKeywords;
+//import baraco.semantics.symboltable.SymbolTableManager;
+//import baraco.semantics.symboltable.scopes.ClassScope;
+//import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+//import baraco.semantics.utils.IdentifiedTokens;
 
 public class BasicMethodAnalyze implements ParseTreeListener {
 
     private ClassScope declaredClassScope;
-    private BaracoMethod declaredBaracoFunction;
+//    private BaracoMethod declaredBaracoFunction;
+    private javaMethod declaredjavaFunction;
     private boolean paramsFlag = false;
 
     public BasicMethodAnalyzer() {
         this.declaredClassScope = SymbolTableManager.getInstance().getLatestScope();
-        this.declaredBaracoFunction = new BaracoMethod();
+//        this.declaredBaracoFunction = new BaracoMethod();
+        this.declaredjavaFunction = new javaMethod();
     }
 
-    public void analyze(BaracoParser.MethodDeclarationContext ctx) {
-        ExecutionManager.getInstance().openFunctionExecution(this.declaredBaracoFunction);
+//    public void analyze(BaracoParser.MethodDeclarationContext ctx) {
+    public void analyze(Java8Parser.MethodDeclarationContext ctx) {
+        ExecutionManager.getInstance().openFunctionExecution(this.declaredjavaFunction);
 
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, ctx);
@@ -51,8 +61,8 @@ public class BasicMethodAnalyze implements ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.MethodDeclarationContext) {
-            BaracoParser.MethodDeclarationContext methodDecCtx = (BaracoParser.MethodDeclarationContext) ctx;
+        if(ctx instanceof Java8Parser.MethodDeclarationContext) {
+            Java8Parser.MethodDeclarationContext methodDecCtx = (Java8Parser.MethodDeclarationContext) ctx;
             MultipleMethodDeclarationChecker funcDecChecker = new MultipleMethodDeclarationChecker(methodDecCtx);
             funcDecChecker.verify();
 
@@ -65,18 +75,18 @@ public class BasicMethodAnalyze implements ParseTreeListener {
 
     @Override
     public void exitEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.MethodDeclarationContext) {
+        if(ctx instanceof Java8Parser.MethodDeclarationContext) {
 
-            BaracoParser.MethodDeclarationContext mdCtx = (BaracoParser.MethodDeclarationContext) ctx;
+            Java8Parser.MethodDeclarationContext mdCtx = (Java8Parser.MethodDeclarationContext) ctx;
 
-            if (!this.declaredBaracoFunction.hasValidReturns()) {
+            if (!this.declaredjavaFunction.hasValidReturns()) {
 
                 int lineNumber = 0;
 
                 if (mdCtx.Identifier() != null)
                     lineNumber = mdCtx.Identifier().getSymbol().getLine();
 
-                BuildChecker.reportCustomError(ErrorRepository.NO_RETURN_STATEMENT, "", this.declaredBaracoFunction.getMethodName(), lineNumber);
+                BuildChecker.reportCustomError(ErrorRepository.NO_RETURN_STATEMENT, "", this.declaredjavaFunction.getMethodName(), lineNumber);
             }
 
 
@@ -86,13 +96,13 @@ public class BasicMethodAnalyze implements ParseTreeListener {
 
     private void analyzeMethod(ParserRuleContext ctx) {
 
-        if(ctx instanceof BaracoParser.TypeTypeContext && !paramsFlag) {
-            BaracoParser.TypeTypeContext typeCtx = (BaracoParser.TypeTypeContext) ctx;
+        if(ctx instanceof Java8Parser.TypeTypeContext && !paramsFlag) {
+            Java8Parser.TypeTypeContext typeCtx = (Java8Parser.TypeTypeContext) ctx;
 
             //return type is a primitive type
             if(typeCtx.primitiveType() != null) {
-                BaracoParser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
-                this.declaredBaracoFunction.setReturnType(BaracoMethod.identifyFunctionType(primitiveTypeCtx.getText()));
+                Java8Parser.PrimitiveTypeContext primitiveTypeCtx = typeCtx.primitiveType();
+                this.declaredjavaFunction.setReturnType(javaMethod.identifyFunctionType(primitiveTypeCtx.getText()));
             }
             //return type is a string or a class type
             else {
@@ -100,31 +110,31 @@ public class BasicMethodAnalyze implements ParseTreeListener {
             }
         }
 
-        else if(ctx instanceof BaracoParser.FormalParametersContext) {
+        else if(ctx instanceof Java8Parser.FormalParametersContext) {
 
             paramsFlag = true;
 
-            BaracoParser.FormalParametersContext formalParamsCtx = (BaracoParser.FormalParametersContext) ctx;
+            Java8Parser.FormalParametersContext formalParamsCtx = (Java8Parser.FormalParametersContext) ctx;
             this.analyzeParameters(formalParamsCtx);
             this.storeMobiFunction();
         }
 
-        else if(ctx instanceof BaracoParser.MethodBodyContext) {
+        else if(ctx instanceof Java8Parser.MethodBodyContext) {
 
-            BaracoParser.BlockContext blockCtx = ((BaracoParser.MethodBodyContext) ctx).block();
+            Java8Parser.BlockContext blockCtx = ((Java8Parser.MethodBodyContext) ctx).block();
 
             BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
-            this.declaredBaracoFunction.setParentLocalScope(LocalScopeCreator.getInstance().getActiveLocalScope());
+            this.declaredjavaFunction.setParentLocalScope(LocalScopeCreator.getInstance().getActiveLocalScope());
             blockAnalyzer.analyze(blockCtx);
 
         }
 
     }
 
-    private void analyzeClassOrInterfaceType(BaracoParser.ClassOrInterfaceTypeContext classOrInterfaceCtx) {
+    private void analyzeClassOrInterfaceType(Java8Parser.ClassOrInterfaceTypeContext classOrInterfaceCtx) {
         //a string identified
-        if(classOrInterfaceCtx.getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
-            this.declaredBaracoFunction.setReturnType(BaracoMethod.MethodType.STRING_TYPE);
+        if(classOrInterfaceCtx.getText().contains(javaKeywords.PRIMITIVE_TYPE_STRING)) {
+            this.declaredjavaFunction.setReturnType(javaMethod.MethodType.STRING_TYPE);
         }
         //a class identified
         else {
@@ -133,12 +143,12 @@ public class BasicMethodAnalyze implements ParseTreeListener {
     }
 
     private void analyzeIdentifier(TerminalNode identifier) {
-        this.declaredBaracoFunction.setMethodName(identifier.getText());
+        this.declaredjavaFunction.setMethodName(identifier.getText());
     }
 
-    private void analyzeParameters(BaracoParser.FormalParametersContext formalParamsCtx) {
+    private void analyzeParameters(Java8Parser.FormalParametersContext formalParamsCtx) {
         if(formalParamsCtx.formalParameterList() != null) {
-            ParameterAnalyzer parameterAnalyzer = new ParameterAnalyzer(this.declaredBaracoFunction);
+            ParameterAnalyzer parameterAnalyzer = new ParameterAnalyzer(this.declaredjavaFunction);
             parameterAnalyzer.analyze(formalParamsCtx.formalParameterList());
         }
     }
@@ -147,7 +157,7 @@ public class BasicMethodAnalyze implements ParseTreeListener {
      * Stores the created function in its corresponding class scope
      */
     private void storeMobiFunction() {
-        this.declaredClassScope.addPrivateBaracoMethod(this.declaredBaracoFunction.getMethodName(), this.declaredBaracoFunction);
+        this.declaredClassScope.addPrivatejavaMethod(this.declaredjavaFunction.getMethodName(), this.declaredjavaFunction);
     }
 
 }

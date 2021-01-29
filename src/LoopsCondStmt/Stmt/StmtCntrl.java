@@ -11,9 +11,9 @@ public class StmtCntrl {
 
     private final static String TAG = "StatementControlOverseer";
 
-    private static StatementControlOverseer sharedInstance = null;
+    private static StmtCntrl sharedInstance = null;
 
-    public static StatementControlOverseer getInstance() {
+    public static StmtCntrl getInstance() {
         return sharedInstance;
     }
 
@@ -26,14 +26,14 @@ public class StmtCntrl {
 
     private IAttemptCommand.CatchTypeEnum currentCatchType = null;
 
-    private StatementControlOverseer() {
+    private StmtCntrl() {
         this.procedureCallStack = new Stack<ICommand>();
 
         System.out.println(TAG + ": " + "Stack initialized!");
     }
 
     public static void initialize() {
-        sharedInstance = new StatementControlOverseer();
+        sharedInstance = new StmtCntrl();
     }
 
     public static void reset() {

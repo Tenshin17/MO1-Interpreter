@@ -1,20 +1,30 @@
-//package LoopsCondStmt.Analyze;
+package LoopsCondStmt.Analyze;
 
-package baraco.semantics.analyzers;
+//package baraco.semantics.analyzers;
 
-import baraco.antlr.parser.BaracoParser;
-import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
-import baraco.execution.ExecutionManager;
-import baraco.execution.commands.controlled.IAttemptCommand;
-import baraco.execution.commands.controlled.IConditionalCommand;
-import baraco.execution.commands.controlled.IControlledCommand;
-import baraco.execution.commands.evaluation.ArrayInitializeCommand;
-import baraco.representations.BaracoArray;
-import baraco.representations.BaracoValue;
-import baraco.semantics.statements.StatementControlOverseer;
-import baraco.semantics.symboltable.scopes.ClassScope;
-import baraco.semantics.symboltable.scopes.LocalScope;
-import baraco.semantics.utils.IdentifiedTokens;
+//import baraco.antlr.parser.BaracoParser;
+//import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
+//import baraco.execution.ExecutionManager;
+//import baraco.execution.commands.controlled.IAttemptCommand;
+//import baraco.execution.commands.controlled.IConditionalCommand;
+//import baraco.execution.commands.controlled.IControlledCommand;
+//import baraco.execution.commands.evaluation.ArrayInitializeCommand;
+//import baraco.representations.BaracoArray;
+//import baraco.representations.BaracoValue;
+//import baraco.semantics.statements.StatementControlOverseer;
+//import baraco.semantics.symboltable.scopes.ClassScope;
+//import baraco.semantics.symboltable.scopes.LocalScope;
+//import baraco.semantics.utils.IdentifiedTokens;
+
+import antlr.Java8Parser;
+import Command.ICondCommand;
+import Command.ICtrlCommand;
+import EvalSimpCompExp.ArrayInitCom;
+import VarAndConstDec.javaArray;
+import VarAndConstDec.javaValue;
+import LoopsCondStmt.Stmt.StmtCntrl;
+import symboltable.scope.ClassScope;
+import symboltable.scope.LocalScope;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;

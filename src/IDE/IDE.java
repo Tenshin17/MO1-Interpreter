@@ -1,3 +1,9 @@
+package IDE;
+
+import antlr.Java8ErrorListener;
+import antlr.Java8Lexer;
+import antlr.Java8Listener;
+import antlr.Java8Parser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -5,9 +11,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class IDE {
@@ -15,13 +18,11 @@ public class IDE {
     public JButton btnRun;
     public JButton btnTree;
     public JLabel labelInput;
-    public JTextArea txaInput;
-    public JTextArea txaConsole;
+    public static JTextArea txaInput;
+    public static JTextArea txaConsole;
     public JButton btnClear;
     public JPanel mainPanel;
     public JTextArea txaOutput;
-
-    public static final String INPUT_FILE = "src/input.txt";
 
     public IDE() {
 
@@ -45,6 +46,10 @@ public class IDE {
                 txaOutput.setText("");
             }
         });
+    }
+
+    public static void printToConsole(String stmt) {
+        txaConsole.append(stmt);
     }
 
     public void run(String srccode){
@@ -1365,6 +1370,46 @@ public class IDE {
                 }
 
                 @Override
+                public void enterPrintStatement(Java8Parser.PrintStatementContext ctx) {
+
+                }
+
+                @Override
+                public void exitPrintStatement(Java8Parser.PrintStatementContext ctx) {
+
+                }
+
+                @Override
+                public void enterPrintExpression(Java8Parser.PrintExpressionContext ctx) {
+
+                }
+
+                @Override
+                public void exitPrintExpression(Java8Parser.PrintExpressionContext ctx) {
+
+                }
+
+                @Override
+                public void enterPrintExtension(Java8Parser.PrintExtensionContext ctx) {
+
+                }
+
+                @Override
+                public void exitPrintExtension(Java8Parser.PrintExtensionContext ctx) {
+
+                }
+
+                @Override
+                public void enterScanStatement(Java8Parser.ScanStatementContext ctx) {
+
+                }
+
+                @Override
+                public void exitScanStatement(Java8Parser.ScanStatementContext ctx) {
+
+                }
+
+                @Override
                 public void enterStatementNoShortIf(Java8Parser.StatementNoShortIfContext ctx) {
 
                 }
@@ -2445,7 +2490,7 @@ public class IDE {
             }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         JFrame frame  = new JFrame("IDE");
         frame.setContentPane(new IDE().mainPanel);
         frame.setBounds(100, 100, 1366, 720);

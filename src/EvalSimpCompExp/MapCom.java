@@ -1,24 +1,24 @@
-package baraco.execution.commands.evaluation;
+package java.execution.commands.evaluation;
 //package EvalSimpCompExp;
 
-import baraco.antlr.parser.BaracoParser;
-import baraco.builder.errorcheckers.UndeclaredChecker;
-import baraco.execution.commands.EvaluationCommand;
-import baraco.execution.commands.ICommand;
-import baraco.representations.BaracoValue;
-import baraco.semantics.analyzers.MethodCallVerifier;
-import baraco.semantics.searching.VariableSearcher;
-import baraco.semantics.utils.AssignmentUtils;
+import antlr.Java8Parser;
+import java.builder.errorcheckers.UndeclaredChecker;
+import java.execution.commands.EvaluationCommand;
+import Command.ICommand;
+import VarAndConstDec.javaValue;
+import java.semantics.analyzers.MethodCallVerifier;
+import java.semantics.searching.VariableSearcher;
+import java.semantics.utils.AssignmentUtils;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class MapCom implements ICommand{
 
     private String identifierString;
-    private BaracoParser.ExpressionContext parentExprCtx;
+    private Java8Parser.ExpressionContext parentExprCtx;
 
     private String modifiedExp;
 
-    public MappingCommand(String identifierString, BaracoParser.ExpressionContext exprCtx) {
+    public MappingCommand(String identifierString, Java8Parser.ExpressionContext exprCtx) {
         this.identifierString = identifierString;
         this.parentExprCtx = exprCtx;
 
@@ -44,12 +44,12 @@ public class MapCom implements ICommand{
         if (evaluationCommand.hasException())
             return;
 
-        BaracoValue baracoValue = VariableSearcher.searchVariable(this.identifierString);
+        javaValue javaValue = VariableSearcher.searchVariable(this.identifierString);
 
         if (evaluationCommand.isNumericResult())
-            AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+            AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
         else
-            AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+            AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getStringResult());
     }
 
     /*
@@ -63,7 +63,7 @@ public class MapCom implements ICommand{
         return identifierString;
     }
 
-    public BaracoParser.ExpressionContext getParentExprCtx() {
+    public Java8Parser.ExpressionContext getParentExprCtx() {
         return parentExprCtx;
     }
 }

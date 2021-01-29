@@ -1,19 +1,19 @@
-package baraco.execution.commands.evaluation;
+package EvalSimpCompExp;
 //package EvalSimpCompExp;
 
-import baraco.antlr.lexer.BaracoLexer;
-import baraco.antlr.parser.BaracoParser.*;
-import baraco.builder.errorcheckers.ConstChecker;
-import baraco.builder.errorcheckers.TypeChecker;
-import baraco.builder.errorcheckers.UndeclaredChecker;
-import baraco.execution.ExecutionManager;
-import baraco.execution.commands.EvaluationCommand;
-import baraco.execution.commands.ICommand;
-import baraco.representations.BaracoArray;
-import baraco.representations.BaracoValue;
-import baraco.semantics.analyzers.MethodCallVerifier;
-import baraco.semantics.searching.VariableSearcher;
-import baraco.semantics.utils.AssignmentUtils;
+import antlr.Java8Lexer;
+import antlr.Java8Parser.*;
+import java.builder.errorcheckers.ConstChecker;
+import java.builder.errorcheckers.TypeChecker;
+import java.builder.errorcheckers.UndeclaredChecker;
+import java.execution.ExecutionManager;
+import java.execution.commands.EvaluationCommand;
+import Command.ICommand;
+import VarAndConstDec.javaArray;
+import VarAndConstDec.javaValue;
+import java.semantics.analyzers.MethodCallVerifier;
+import java.semantics.searching.VariableSearcher;
+import java.semantics.utils.AssignmentUtils;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -27,7 +27,7 @@ public class AssignCom implements ICommand {
     private ExpressionContext leftHandExprCtx;
     private ExpressionContext rightHandExprCtx;
 
-    public AssignmentCommand(ExpressionContext leftHandExprCtx,
+    public AssignCom(ExpressionContext leftHandExprCtx,
                              ExpressionContext rightHandExprCtx) {
         this.leftHandExprCtx = leftHandExprCtx;
         this.rightHandExprCtx = rightHandExprCtx;
@@ -46,15 +46,15 @@ public class AssignCom implements ICommand {
         functionWalker.walk(new MethodCallVerifier(), this.rightHandExprCtx);
 
         //type check the mobivalue
-        BaracoValue baracoValue;
+        javaValue javaValue;
         if(ExecutionManager.getInstance().isInFunctionExecution()) {
-            baracoValue = VariableSearcher.searchVariableInFunction(ExecutionManager.getInstance().getCurrentFunction(), this.leftHandExprCtx.getText());
+            javaValue = VariableSearcher.searchVariableInFunction(ExecutionManager.getInstance().getCurrentFunction(), this.leftHandExprCtx.getText());
         }
         else {
-            baracoValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
+            javaValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
         }
 
-        TypeChecker typeChecker = new TypeChecker(baracoValue, this.rightHandExprCtx);
+        TypeChecker typeChecker = new TypeChecker(javaValue, this.rightHandExprCtx);
         typeChecker.verify();
     }
 
@@ -79,26 +79,26 @@ public class AssignCom implements ICommand {
                 this.handleArrayAssignment(evaluationCommand.getStringResult());
         }
         else {
-            BaracoValue baracoValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
+            javaValue javaValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
 
             if (evaluationCommand.isNumericResult()) {
 
-                if (!baracoValue.isFinal()) {
-                    AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult());
+                if (!javaValue.isFinal()) {
+                    AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
                 }
 
             } else {
 
-                if (!baracoValue.isFinal()) {
-                    AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+                if (!javaValue.isFinal()) {
+                    AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getStringResult());
                 }
             }
         }
     }
 
     public boolean isLeftHandArrayAccessor() {
-        List<TerminalNode> lBrackTokens = this.leftHandExprCtx.getTokens(BaracoLexer.LBRACK);
-        List<TerminalNode> rBrackTokens = this.leftHandExprCtx.getTokens(BaracoLexer.RBRACK);
+        List<TerminalNode> lBrackTokens = this.leftHandExprCtx.getTokens(Java8Lexer.LBRACK);
+        List<TerminalNode> rBrackTokens = this.leftHandExprCtx.getTokens(Java8Lexer.RBRACK);
 
         return(lBrackTokens.size() > 0 && rBrackTokens.size() > 0);
     }
@@ -107,8 +107,8 @@ public class AssignCom implements ICommand {
         TerminalNode identifierNode = this.leftHandExprCtx.expression(0).primary().Identifier();
         ExpressionContext arrayIndexExprCtx = this.leftHandExprCtx.expression(1);
 
-        BaracoValue baracoValue = VariableSearcher.searchVariable(identifierNode.getText());
-        BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
+        javaValue javaValue = VariableSearcher.searchVariable(identifierNode.getText());
+        javaArray javaArray = (javaArray) javaValue.getValue();
 
         EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx);
         evaluationCommand.execute();
@@ -116,9 +116,9 @@ public class AssignCom implements ICommand {
         ExecutionManager.getInstance().setCurrentCheckedLineNumber(arrayIndexExprCtx.getStart().getLine());
 
         //create a new array value to replace value at specified index
-        BaracoValue newArrayValue = new BaracoValue(null, baracoArray.getPrimitiveType());
+        javaValue newArrayValue = new javaValue(null, javaArray.getPrimitiveType());
         newArrayValue.setValue(resultString);
-        baracoArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
+        javaArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
 
         //Console.log("Index to access: " +evaluationCommand.getResult().intValue()+ " Updated with: " +resultString);
     }

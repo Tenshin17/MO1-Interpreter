@@ -1,19 +1,19 @@
-package baraco.execution.commands.evaluation;
+package java.execution.commands.evaluation;
 //package EvalSimpCompExp;
 
-import baraco.antlr.lexer.BaracoLexer;
-import baraco.antlr.parser.BaracoParser;
-import baraco.builder.errorcheckers.ConstChecker;
-import baraco.builder.errorcheckers.TypeChecker;
-import baraco.builder.errorcheckers.UndeclaredChecker;
-import baraco.execution.ExecutionManager;
-import baraco.execution.commands.EvaluationCommand;
-import baraco.execution.commands.ICommand;
-import baraco.representations.BaracoArray;
-import baraco.representations.BaracoValue;
-import baraco.semantics.analyzers.MethodCallVerifier;
-import baraco.semantics.searching.VariableSearcher;
-import baraco.semantics.utils.AssignmentUtils;
+import antlr.Java8Lexer;
+import antlr.Java8Parser;
+import java.builder.errorcheckers.ConstChecker;
+import java.builder.errorcheckers.TypeChecker;
+import java.builder.errorcheckers.UndeclaredChecker;
+import java.execution.ExecutionManager;
+import java.execution.commands.EvaluationCommand;
+import Command.ICommand;
+import VarAndConstDec.javaArray;
+import VarAndConstDec.javaValue;
+import java.semantics.analyzers.MethodCallVerifier;
+import java.semantics.searching.VariableSearcher;
+import java.semantics.utils.AssignmentUtils;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -21,12 +21,12 @@ import java.util.List;
 
 public class ShortCom implements ICommand {
 
-    private BaracoParser.ExpressionContext leftHandExprCtx;
-    private BaracoParser.ExpressionContext rightHandExprCtx;
+    private Java8Parser.ExpressionContext leftHandExprCtx;
+    private Java8Parser.ExpressionContext rightHandExprCtx;
     int tokenSign;
 
-    public ShorthandCommand(BaracoParser.ExpressionContext leftHandExprCtx,
-                            BaracoParser.ExpressionContext rightHandExprCtx, int tokenSign) {
+    public ShorthandCommand(Java8Parser.ExpressionContext leftHandExprCtx,
+                            Java8Parser.ExpressionContext rightHandExprCtx, int tokenSign) {
         this.leftHandExprCtx = leftHandExprCtx;
         this.rightHandExprCtx = rightHandExprCtx;
         this.tokenSign = tokenSign;
@@ -44,15 +44,15 @@ public class ShortCom implements ICommand {
         functionWalker.walk(new MethodCallVerifier(), this.rightHandExprCtx);
 
         //type check the mobivalue
-        BaracoValue baracoValue;
+        javaValue javaValue;
         if(ExecutionManager.getInstance().isInFunctionExecution()) {
-            baracoValue = VariableSearcher.searchVariableInFunction(ExecutionManager.getInstance().getCurrentFunction(), this.leftHandExprCtx.getText());
+            javaValue = VariableSearcher.searchVariableInFunction(ExecutionManager.getInstance().getCurrentFunction(), this.leftHandExprCtx.getText());
         }
         else {
-            baracoValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
+            javaValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
         }
 
-        TypeChecker typeChecker = new TypeChecker(baracoValue, this.rightHandExprCtx);
+        TypeChecker typeChecker = new TypeChecker(javaValue, this.rightHandExprCtx);
         typeChecker.verify();
     }
 
@@ -73,22 +73,22 @@ public class ShortCom implements ICommand {
             this.handleArrayAssignment(evaluationCommand.getResult().toEngineeringString());
         }
         else {
-            BaracoValue baracoValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
+            javaValue javaValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
 
             if (evaluationCommand.isNumericResult()) {
 
-                if (!baracoValue.isFinal()) {
+                if (!javaValue.isFinal()) {
                     // Add checking for shorthand expressions
-                    AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getResult(), tokenSign);
+                    AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult(), tokenSign);
                 }
 
             } else {
-                if (!baracoValue.isFinal()) {
-                    if (this.tokenSign == BaracoLexer.ADD_ASSIGN) {
-                        AssignmentUtils.addAssignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+                if (!javaValue.isFinal()) {
+                    if (this.tokenSign == Java8Lexer.ADD_ASSIGN) {
+                        AssignmentUtils.addAssignAppropriateValue(javaValue, evaluationCommand.getStringResult());
                     }
                     else {
-                        AssignmentUtils.assignAppropriateValue(baracoValue, evaluationCommand.getStringResult());
+                        AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getStringResult());
                     }
                 }
             }
@@ -96,18 +96,18 @@ public class ShortCom implements ICommand {
     }
 
     private boolean isLeftHandArrayAccessor() {
-        List<TerminalNode> lBrackTokens = this.leftHandExprCtx.getTokens(BaracoLexer.LBRACK);
-        List<TerminalNode> rBrackTokens = this.leftHandExprCtx.getTokens(BaracoLexer.RBRACK);
+        List<TerminalNode> lBrackTokens = this.leftHandExprCtx.getTokens(Java8Lexer.LBRACK);
+        List<TerminalNode> rBrackTokens = this.leftHandExprCtx.getTokens(Java8Lexer.RBRACK);
 
         return(lBrackTokens.size() > 0 && rBrackTokens.size() > 0);
     }
 
     private void handleArrayAssignment(String resultString) {
         TerminalNode identifierNode = this.leftHandExprCtx.expression(0).primary().Identifier();
-        BaracoParser.ExpressionContext arrayIndexExprCtx = this.leftHandExprCtx.expression(1);
+        Java8Parser.ExpressionContext arrayIndexExprCtx = this.leftHandExprCtx.expression(1);
 
-        BaracoValue baracoValue = VariableSearcher.searchVariable(identifierNode.getText());
-        BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
+        javaValue javaValue = VariableSearcher.searchVariable(identifierNode.getText());
+        javaArray javaArray = (javaArray) javaValue.getValue();
 
         EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx);
         evaluationCommand.execute();
@@ -115,9 +115,9 @@ public class ShortCom implements ICommand {
         ExecutionManager.getInstance().setCurrentCheckedLineNumber(identifierNode.getSymbol().getLine());
 
         //create a new array value to replace value at specified index
-        BaracoValue newArrayValue = new BaracoValue(null, baracoArray.getPrimitiveType());
+        javaValue newArrayValue = new javaValue(null, javaArray.getPrimitiveType());
         newArrayValue.setValue(resultString);
-        baracoArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
+        javaArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
 
         //Console.log("Index to access: " +evaluationCommand.getResult().intValue()+ " Updated with: " +resultString);
     }

@@ -1,22 +1,22 @@
-package baraco.execution.commands.evaluation;
+package EvalSimpCompExp;
 //package EvalSimpCompExp;
 
-import baraco.antlr.parser.BaracoParser;
-import baraco.builder.BuildChecker;
-import baraco.builder.ErrorRepository;
-import baraco.execution.ExecutionManager;
-import baraco.execution.commands.EvaluationCommand;
-import baraco.execution.commands.ICommand;
-import baraco.representations.BaracoArray;
+import antlr.Java8Parser;
+import java.builder.BuildChecker;
+import java.builder.ErrorRepository;
+import java.execution.ExecutionManager;
+import java.execution.commands.EvaluationCommand;
+import Command.ICommand;
+import VarAndConstDec.javaArray;
 import org.antlr.v4.runtime.Token;
 
 public class ArrayInitCom implements ICommand {
 
-    private BaracoArray assignedBaracoArray;
-    private BaracoParser.ArrayCreatorRestContext arrayCreatorCtx;
+    private javaArray assignedjavaArray;
+    private Java8Parser.ArrayCreatorRestContext arrayCreatorCtx;
 
-    public ArrayInitializeCommand(BaracoArray baracoArray, BaracoParser.ArrayCreatorRestContext arrayCreatorCtx) {
-        this.assignedBaracoArray = baracoArray;
+    public ArrayInitializeCommand(javaArray javaArray, Java8Parser.ArrayCreatorRestContext arrayCreatorCtx) {
+        this.assignedjavaArray = javaArray;
         this.arrayCreatorCtx = arrayCreatorCtx;
 
         if (arrayCreatorCtx.expression(0) != null) {
@@ -34,14 +34,14 @@ public class ArrayInitCom implements ICommand {
      */
     @Override
     public void execute() {
-        BaracoParser.ExpressionContext exprCtx = this.arrayCreatorCtx.expression(0);
+        Java8Parser.ExpressionContext exprCtx = this.arrayCreatorCtx.expression(0);
 
         if(exprCtx != null) {
             EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
             evaluationCommand.execute();
 
             ExecutionManager.getInstance().setCurrentCheckedLineNumber(exprCtx.getStart().getLine());
-            this.assignedBaracoArray.initializeSize(evaluationCommand.getResult().intValue());
+            this.assignedjavaArray.initializeSize(evaluationCommand.getResult().intValue());
         }
 
     }

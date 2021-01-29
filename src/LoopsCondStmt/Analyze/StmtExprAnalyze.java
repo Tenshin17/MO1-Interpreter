@@ -329,13 +329,10 @@ public class StmtExprAnalyze implements ParseTreeListener {
     }
 
     private boolean isFunctionCallWithNoParams(ExpressionContext exprCtx) {
-        if(exprCtx.depth() == FUNCTION_CALL_NO_PARAMS_DEPTH || exprCtx.depth() == 17) {
-            //ThisKeywordChecker thisChecker = new ThisKeywordChecker(exprCtx);
-            //thisChecker.verify();
-            //if(exprCtx.Identifier() != null)
-            return true;
-        }
+        //ThisKeywordChecker thisChecker = new ThisKeywordChecker(exprCtx);
+        //thisChecker.verify();
+        //if(exprCtx.Identifier() != null)
+        return exprCtx.depth() == FUNCTION_CALL_NO_PARAMS_DEPTH || exprCtx.depth() == 17;
 
-        return false;
     }
 }

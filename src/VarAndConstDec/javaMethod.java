@@ -1,24 +1,24 @@
 //package VarAndConstDec;
 package VarAndConstDec;
 
-import baraco.builder.errorcheckers.TypeChecker;
-import baraco.execution.ExecutionManager;
-import baraco.execution.ExecutionMonitor;
-import baraco.execution.MethodTracker;
-import baraco.execution.commands.ICommand;
-import baraco.execution.commands.controlled.ForCommand;
-import baraco.execution.commands.controlled.IControlledCommand;
-import baraco.execution.commands.controlled.IfCommand;
-import baraco.execution.commands.evaluation.AssignmentCommand;
-import baraco.execution.commands.evaluation.MappingCommand;
-import baraco.execution.commands.simple.IncDecCommand;
-import baraco.execution.commands.simple.ReturnCommand;
-import baraco.representations.BaracoValue.PrimitiveType;
-import baraco.semantics.searching.VariableSearcher;
-import baraco.semantics.symboltable.scopes.ClassScope;
-import baraco.semantics.symboltable.scopes.LocalScope;
-import baraco.antlr.parser.BaracoParser.ExpressionContext;
-import baraco.semantics.utils.LocalVarTracker;
+import java.builder.errorcheckers.TypeChecker;
+import java.execution.ExecutionManager;
+import java.execution.ExecutionMonitor;
+import java.execution.MethodTracker;
+import Command.ICommand;
+import java.execution.commands.controlled.ForCommand;
+import java.execution.commands.controlled.IControlledCommand;
+import java.execution.commands.controlled.IfCommand;
+import java.execution.commands.evaluation.AssignmentCommand;
+import java.execution.commands.evaluation.MappingCommand;
+import java.execution.commands.simple.IncDecCommand;
+import java.execution.commands.simple.ReturnCommand;
+import VarAndConstDec.javaValue.PrimitiveType;
+import java.semantics.searching.VariableSearcher;
+import java.semantics.symboltable.scopes.ClassScope;
+import java.semantics.symboltable.scopes.LocalScope;
+import java.antlr.parser.javaParser.ExpressionContext;
+import java.semantics.utils.LocalVarTracker;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,12 +27,12 @@ import java.util.Stack;
 
 public class javaMethod implements IControlledCommand{
 
-    private final static String TAG = "BaracoMethod";
+    private final static String TAG = "javaMethod";
 
     public enum MethodType {
         BOOL_TYPE,
         INT_TYPE,
-        DECIMAL_TYPE,
+        FLOAT_TYPE,
         STRING_TYPE,
         CHAR_TYPE,
         VOID_TYPE
@@ -44,15 +44,15 @@ public class javaMethod implements IControlledCommand{
     private LocalScope parentLocalScope; //refers to the parent local scope of this function.
 
     private LinkedHashMap<String, ClassScope> parameterReferences; //the list of parameters accepted that follows the 'call-by-reference' standard.
-    private LinkedHashMap<String, BaracoValue> parameterValues;	//the list of parameters accepted that follows the 'call-by-value' standard.
-    private BaracoValue returnValue; //the return value of the function. null if it's a void type
+    private LinkedHashMap<String, javaValue> parameterValues;	//the list of parameters accepted that follows the 'call-by-value' standard.
+    private javaValue returnValue; //the return value of the function. null if it's a void type
     private MethodType returnType = MethodType.VOID_TYPE; //the return type of the function
 
     private boolean hasValidReturns = true;
 
-    public BaracoMethod() {
+    public javaMethod() {
         this.commandSequences = new ArrayList<ICommand>();
-        this.parameterValues = new LinkedHashMap<String, BaracoValue>();
+        this.parameterValues = new LinkedHashMap<String, javaValue>();
         this.parameterReferences = new LinkedHashMap<String, ClassScope>();
     }
 
@@ -69,11 +69,11 @@ public class javaMethod implements IControlledCommand{
 
         //create an empty mobi value as a return value
         switch(this.returnType) {
-            case BOOL_TYPE: this.returnValue = new BaracoValue(true, PrimitiveType.BOOL); setValidReturns(false); break;
-            case INT_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.INT); setValidReturns(false); break;
-            case DECIMAL_TYPE: this.returnValue = new BaracoValue(0.0, PrimitiveType.DECIMAL); setValidReturns(false); break;
-            case STRING_TYPE: this.returnValue = new BaracoValue("", PrimitiveType.STRING); setValidReturns(false); break;
-            case CHAR_TYPE: this.returnValue = new BaracoValue(0, PrimitiveType.CHAR); setValidReturns(false); break;
+            case BOOL_TYPE: this.returnValue = new javaValue(true, PrimitiveType.BOOL); setValidReturns(false); break;
+            case INT_TYPE: this.returnValue = new javaValue(0, PrimitiveType.INT); setValidReturns(false); break;
+            case FLOAT_TYPE: this.returnValue = new javaValue(0.0, PrimitiveType.FLOAT); setValidReturns(false); break;
+            case STRING_TYPE: this.returnValue = new javaValue("", PrimitiveType.STRING); setValidReturns(false); break;
+            case CHAR_TYPE: this.returnValue = new javaValue(0, PrimitiveType.CHAR); setValidReturns(false); break;
             default:
                 break;
         }
@@ -104,8 +104,8 @@ public class javaMethod implements IControlledCommand{
      */
     public void mapParameterByValue(String... values) {
         for(int i = 0; i < values.length; i++) {
-            BaracoValue baracoValue = this.getParameterAt(i);
-            baracoValue.setValue(values[i]);
+            javaValue javaValue = this.getParameterAt(i);
+            javaValue.setValue(values[i]);
         }
     }
 
@@ -114,27 +114,27 @@ public class javaMethod implements IControlledCommand{
             return;
         }
 
-        BaracoValue baracoValue = this.getParameterAt(index);
-        baracoValue.setValue(value);
+        javaValue javaValue = this.getParameterAt(index);
+        javaValue.setValue(value);
     }
 
-    public void mapArrayAt(BaracoValue baracoValue, int index, String identifier) {
+    public void mapArrayAt(javaValue javaValue, int index, String identifier) {
         if(index >= this.parameterValues.size()) {
             return;
         }
 
-        /*BaracoArray baracoArray = (BaracoArray) baracoValue.getValue();
+        /*javaArray javaArray = (javaArray) javaValue.getValue();
 
-        BaracoArray newArray = new BaracoArray(baracoArray.getPrimitiveType(), identifier);
-        BaracoValue newValue = new BaracoValue(newArray, PrimitiveType.ARRAY);
+        javaArray newArray = new javaArray(javaArray.getPrimitiveType(), identifier);
+        javaValue newValue = new javaValue(newArray, PrimitiveType.ARRAY);
 
-        newArray.initializeSize(baracoArray.getSize());
+        newArray.initializeSize(javaArray.getSize());
 
         for(int i = 0; i < newArray.getSize(); i++) {
-            newArray.updateValueAt(baracoArray.getValueAt(i), i);
+            newArray.updateValueAt(javaArray.getValueAt(i), i);
         }*/
 
-        this.parameterValues.put(this.getParameterKeyAt(index), baracoValue);
+        this.parameterValues.put(this.getParameterKeyAt(index), javaValue);
 
     }
 
@@ -147,8 +147,8 @@ public class javaMethod implements IControlledCommand{
             return;
         }
 
-        BaracoValue baracoValue = this.getParameterAt(index);
-        TypeChecker typeChecker = new TypeChecker(baracoValue, exprCtx);
+        javaValue javaValue = this.getParameterAt(index);
+        TypeChecker typeChecker = new TypeChecker(javaValue, exprCtx);
         typeChecker.verify();
     }
 
@@ -159,15 +159,15 @@ public class javaMethod implements IControlledCommand{
         //Log.e(TAG, "Mapping of parameter by reference not yet supported.");
     }
 
-    public void addParameter(String identifierString, BaracoValue baracoValue) {
-        this.parameterValues.put(identifierString, baracoValue);
-        System.out.println(this.methodName + " added an empty parameter " +identifierString+ " type " + baracoValue.getPrimitiveType());
+    public void addParameter(String identifierString, javaValue javaValue) {
+        this.parameterValues.put(identifierString, javaValue);
+        System.out.println(this.methodName + " added an empty parameter " +identifierString+ " type " + javaValue.getPrimitiveType());
     }
 
     public boolean hasParameter(String identifierString) {
         return this.parameterValues.containsKey(identifierString);
     }
-    public BaracoValue getParameter(String identifierString) {
+    public javaValue getParameter(String identifierString) {
         if(this.hasParameter(identifierString)) {
             return this.parameterValues.get(identifierString);
         }
@@ -177,10 +177,10 @@ public class javaMethod implements IControlledCommand{
         }
     }
 
-    public BaracoValue getParameterAt(int index) {
+    public javaValue getParameterAt(int index) {
         int i = 0;
 
-        for(BaracoValue mobiValue : this.parameterValues.values()) {
+        for(javaValue mobiValue : this.parameterValues.values()) {
             if(i == index) {
                 return mobiValue;
             }
@@ -207,7 +207,7 @@ public class javaMethod implements IControlledCommand{
         return null;
     }
 
-    public BaracoValue getReturnValue() {
+    public javaValue getReturnValue() {
         if(this.returnType == MethodType.VOID_TYPE) {
             System.out.println(this.methodName + " is a void function. Null mobi value is returned");
             return null;
@@ -263,7 +263,7 @@ public class javaMethod implements IControlledCommand{
     }
 
     private void popBackParameters() {
-        for (BaracoValue bV : this.parameterValues.values()) {
+        for (javaValue bV : this.parameterValues.values()) {
             if(bV.getPrimitiveType() != PrimitiveType.ARRAY)
                 bV.popBack();
         }
@@ -272,7 +272,7 @@ public class javaMethod implements IControlledCommand{
     private void popBackLocalVars() {
         for(String s : LocalVarTracker.getInstance().getCurrentSession()) {
 
-            BaracoValue value = VariableSearcher.searchVariableInFunction(this, s);
+            javaValue value = VariableSearcher.searchVariableInFunction(this, s);
 
             if (value != null) {
 
@@ -293,19 +293,19 @@ public class javaMethod implements IControlledCommand{
 
     public static MethodType identifyFunctionType(String primitiveTypeString) {
 
-        if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_BOOLEAN, primitiveTypeString)) {
+        if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_BOOLEAN, primitiveTypeString)) {
             return MethodType.BOOL_TYPE;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_CHAR, primitiveTypeString)) {
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_CHAR, primitiveTypeString)) {
             return MethodType.CHAR_TYPE;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_DECIMAL, primitiveTypeString)) {
-            return MethodType.DECIMAL_TYPE;
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_FLOAT, primitiveTypeString)) {
+            return MethodType.FLOAT_TYPE;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_INT, primitiveTypeString)) {
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_INT, primitiveTypeString)) {
             return MethodType.INT_TYPE;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_STRING, primitiveTypeString)) {
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_STRING, primitiveTypeString)) {
             return MethodType.STRING_TYPE;
         }
 

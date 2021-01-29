@@ -1,7 +1,7 @@
-package baraco.semantics.statements;
+package LoopsCondStmt.Stmt;
 //package LoopsCondStmt.Stmt;
 import baraco.execution.ExecutionManager;
-import baraco.execution.commands.ICommand;
+import Command.ICommand;
 import baraco.execution.commands.controlled.*;
 import baraco.execution.commands.simple.MethodCallCommand;
 

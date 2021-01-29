@@ -1,5 +1,5 @@
 //package VarAndConstDec;
-package baraco.representations;
+package VarAndConstDec;
 
 public class javaKeywords {
 
@@ -9,7 +9,7 @@ public class javaKeywords {
     public static String PRIMITIVE_TYPE_BOOLEAN = "bool";
     public static String PRIMITIVE_TYPE_INT = "int";
     public static String PRIMITIVE_TYPE_CHAR = "char";
-    public static String PRIMITIVE_TYPE_DECIMAL = "decimal";
+    public static String PRIMITIVE_TYPE_FLOAT = "float";
     public static String PRIMITIVE_TYPE_STRING = "string";
 
     public static String BOOLEAN_TRUE = "true";
@@ -20,11 +20,6 @@ public class javaKeywords {
      * Returns true if the keywords match. This is case-sensitive
      */
     public static boolean matchesKeyword(String keyword, String textToMatch) {
-        if(textToMatch.contains(keyword)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return textToMatch.contains(keyword);
     }
 }

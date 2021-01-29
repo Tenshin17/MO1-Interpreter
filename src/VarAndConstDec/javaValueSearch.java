@@ -1,36 +1,36 @@
 //package VarAndConstDec;
-package baraco.representations;
+package VarAndConstDec;
 
-import baraco.builder.ParserHandler;
-import baraco.execution.MethodTracker;
-import baraco.semantics.symboltable.SymbolTableManager;
-import baraco.semantics.symboltable.scopes.ClassScope;
-import baraco.semantics.symboltable.scopes.LocalScopeCreator;
+import java.builder.ParserHandler;
+import java.execution.MethodTracker;
+import java.semantics.symboltable.SymbolTableManager;
+import java.semantics.symboltable.scopes.ClassScope;
+import java.semantics.symboltable.scopes.LocalScopeCreator;
 
-public class BaracoValueSearcher {
-    private final static String TAG = "BaracoValueSearcher";
+public class javaValueSearch {
+    private final static String TAG = "javaValueSearcher";
 
-    public static BaracoValue searchBaracoValue(String identifier) {
+    public static javaValue searchjavaValue(String identifier) {
 
-        BaracoValue baracoValue = null;
+        javaValue javaValue = null;
 
         if(MethodTracker.getInstance().isInsideFunction()) {
-            BaracoMethod mobiFunction = MethodTracker.getInstance().getLatestFunction();
+            javaMethod mobiFunction = MethodTracker.getInstance().getLatestFunction();
 
             if(mobiFunction.hasParameter(identifier)) {
-                baracoValue =  mobiFunction.getParameter(identifier);
+                javaValue =  mobiFunction.getParameter(identifier);
             }
             else {
-                baracoValue = LocalScopeCreator.searchVariableInLocalIterative(identifier, mobiFunction.getParentLocalScope());
+                javaValue = LocalScopeCreator.searchVariableInLocalIterative(identifier, mobiFunction.getParentLocalScope());
             }
         }
 
-        if(baracoValue == null) {
+        if(javaValue == null) {
             ClassScope classScope = SymbolTableManager.getInstance().getClassScope(ParserHandler.getInstance().getCurrentClassName());
-            baracoValue = classScope.searchVariableIncludingLocal(identifier);
+            javaValue = classScope.searchVariableIncludingLocal(identifier);
         }
 
-        return baracoValue;
+        return javaValue;
 
     }
 }

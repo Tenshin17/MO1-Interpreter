@@ -3,9 +3,9 @@ package baraco.execution.commands.simple;
 
 import baraco.builder.errorcheckers.UndeclaredChecker;
 import baraco.execution.commands.EvaluationCommand;
-import baraco.execution.commands.ICommand;
-import baraco.antlr.parser.BaracoParser.*;
-import baraco.ide.View;
+import Command.ICommand;
+import antlr.Java8Parser.*;
+import IDE.IDE;
 import baraco.representations.BaracoArray;
 import baraco.representations.BaracoValue;
 import baraco.representations.BaracoValueSearcher;
@@ -26,18 +26,18 @@ public class PrintCom implements ICommand, ParseTreeListener {
 
     private final static String TAG = "PrintCommand";
 
-    private ExpressionContext expressionCtx;
+    private PrintExpressionContext expressionCtx;
 
     private String statementToPrint = "";
     private boolean isLN = false;
 
     private boolean evaluatedExp = false;
 
-    public PrintCommand(StatementContext sCtx) {
+    public PrintCom(PrintStatementContext sCtx) {
 
         isLN = sCtx.PRINTLN() != null;
 
-        this.expressionCtx = sCtx.expression(0);
+        this.expressionCtx = sCtx.printExpression();
 
         UndeclaredChecker undeclaredChecker = new UndeclaredChecker(expressionCtx);
         undeclaredChecker.verify();
@@ -53,7 +53,7 @@ public class PrintCom implements ICommand, ParseTreeListener {
         if (isLN)
             statementToPrint += "\n";
 
-        View.printInConsole(this.statementToPrint);
+        IDE.printToConsole(this.statementToPrint);
 
         statementToPrint = "";
         evaluatedExp = false;
@@ -73,9 +73,9 @@ public class PrintCom implements ICommand, ParseTreeListener {
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
 
-        if (ctx instanceof ExpressionContext && !evaluatedExp) {
+        if (ctx instanceof PrintExpressionContext && !evaluatedExp) {
 
-            ExpressionContext expCtx = (ExpressionContext) ctx;
+            PrintExpressionContext expCtx = (PrintExpressionContext) ctx;
 
             EvaluationCommand evComm = new EvaluationCommand(expCtx);
             evComm.execute();

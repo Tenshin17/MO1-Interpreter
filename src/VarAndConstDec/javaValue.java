@@ -1,5 +1,5 @@
 //package VarAndConstDec;
-package baraco.representations;
+package VarAndConstDec;
 
 import java.util.Stack;
 
@@ -10,7 +10,7 @@ public class javaValue {
         NOT_YET_IDENTIFIED,
         BOOL,
         INT,
-        DECIMAL,
+        FLOAT,
         STRING,
         CHAR,
         ARRAY
@@ -21,7 +21,7 @@ public class javaValue {
     private PrimitiveType primitiveType = PrimitiveType.NOT_YET_IDENTIFIED;
     private boolean finalFlag = false;
 
-    public BaracoValue(Object value, PrimitiveType primitiveType) {
+    public javaValue(Object value, PrimitiveType primitiveType) {
         if(value == null || checkValueType(value, primitiveType)) {
             this.value = new Stack<Object>();
 
@@ -96,7 +96,7 @@ public class javaValue {
                 } else {
                     return Integer.valueOf(value);
                 }
-            case DECIMAL: return Double.valueOf(value);
+            case FLOAT: return Float.valueOf(value);
             case STRING: return value;
             default: return null;
         }
@@ -118,8 +118,8 @@ public class javaValue {
                 return value instanceof Boolean;
             case INT:
                 return value instanceof Integer;
-            case DECIMAL:
-                return value instanceof Double;
+            case FLOAT:
+                return value instanceof Float;
             case STRING:
                 return value instanceof String;
             case ARRAY:
@@ -133,29 +133,29 @@ public class javaValue {
      * Utility function.
      * Attempts to add an empty variable based from keywords
      */
-    public static BaracoValue createEmptyVariableFromKeywords(String primitiveTypeString) {
+    public static javaValue createEmptyVariableFromKeywords(String primitiveTypeString) {
 
         //identify primitive type
         PrimitiveType primitiveType = PrimitiveType.NOT_YET_IDENTIFIED;
 
-        if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_BOOLEAN, primitiveTypeString)) {
+        if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_BOOLEAN, primitiveTypeString)) {
             primitiveType = PrimitiveType.BOOL;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_CHAR, primitiveTypeString)) {
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_CHAR, primitiveTypeString)) {
             primitiveType = PrimitiveType.CHAR;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_DECIMAL, primitiveTypeString)) {
-            primitiveType = PrimitiveType.DECIMAL;
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_FLOAT, primitiveTypeString)) {
+            primitiveType = PrimitiveType.FLOAT;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_INT, primitiveTypeString)) {
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_INT, primitiveTypeString)) {
             primitiveType = PrimitiveType.INT;
         }
-        else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.PRIMITIVE_TYPE_STRING, primitiveTypeString)) {
+        else if(javaKeywords.matchesKeyword(javaKeywords.PRIMITIVE_TYPE_STRING, primitiveTypeString)) {
             primitiveType = PrimitiveType.STRING;
         }
 
-        BaracoValue baracoValue = new BaracoValue(null, primitiveType);
+        javaValue javaValue = new javaValue(null, primitiveType);
 
-        return baracoValue;
+        return javaValue;
     }
 }

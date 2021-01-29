@@ -2,14 +2,14 @@ package LoopsCondStmt.Analyze;
 
 //package baraco.semantics.analyzers;
 
-//import baraco.antlr.parser.BaracoParser;
+//import baraco.antlr.parser.Java8Parser;
 //import baraco.builder.errorcheckers.MultipleVariableDeclarationChecker;
 //import baraco.execution.ExecutionManager;
 //import baraco.execution.commands.controlled.IAttemptCommand;
 //import baraco.execution.commands.controlled.IConditionalCommand;
 //import baraco.execution.commands.controlled.IControlledCommand;
 //import baraco.execution.commands.evaluation.ArrayInitializeCommand;
-//import baraco.representations.BaracoArray;
+//import baraco.representations.javaArray;
 //import baraco.representations.BaracoValue;
 //import baraco.semantics.statements.StatementControlOverseer;
 //import baraco.semantics.symboltable.scopes.ClassScope;
@@ -41,7 +41,7 @@ public class ArrayAnalyze implements ParseTreeListener {
     private IdentifiedTokens identifiedTokens;
     private ClassScope declaredClassScope;
     private LocalScope localScope;
-    private BaracoArray declaredArray;
+    private javaArray declaredArray;
 
     public ArrayAnalyzer( IdentifiedTokens identifiedTokens, ClassScope declaredClassScope) {
         this.identifiedTokens = identifiedTokens;
@@ -72,25 +72,25 @@ public class ArrayAnalyze implements ParseTreeListener {
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
-        if(ctx instanceof BaracoParser.PrimitiveTypeContext) {
-            BaracoParser.PrimitiveTypeContext primitiveCtx = (BaracoParser.PrimitiveTypeContext) ctx;
+        if(ctx instanceof Java8Parser.PrimitiveTypeContext) {
+            Java8Parser.PrimitiveTypeContext primitiveCtx = (Java8Parser.PrimitiveTypeContext) ctx;
             this.identifiedTokens.addToken(ARRAY_PRIMITIVE_KEY, primitiveCtx.getText());
         }
-        else if(ctx instanceof BaracoParser.VariableDeclaratorIdContext) {
-            BaracoParser.VariableDeclaratorIdContext varDecIdCtx = (BaracoParser.VariableDeclaratorIdContext) ctx;
+        else if(ctx instanceof Java8Parser.VariableDeclaratorIdContext) {
+            Java8Parser.VariableDeclaratorIdContext varDecIdCtx = (Java8Parser.VariableDeclaratorIdContext) ctx;
             MultipleVariableDeclarationChecker multipleDeclaredChecker = new MultipleVariableDeclarationChecker(varDecIdCtx);
             multipleDeclaredChecker.verify();
             this.identifiedTokens.addToken(ARRAY_IDENTIFIER_KEY, varDecIdCtx.getText());
 
             this.analyzeArray();
         }
-        else if(ctx instanceof BaracoParser.CreatedNameContext) {
-            BaracoParser.CreatedNameContext createdNameCtx = (BaracoParser.CreatedNameContext) ctx;
+        else if(ctx instanceof Java8Parser.CreatedNameContext) {
+            Java8Parser.CreatedNameContext createdNameCtx = (Java8Parser.CreatedNameContext) ctx;
             //Console.log(LogType.DEBUG, "Array created name: " +createdNameCtx.getText());
         }
 
-        else if(ctx instanceof BaracoParser.ArrayCreatorRestContext) {
-            BaracoParser.ArrayCreatorRestContext arrayCreatorCtx = (BaracoParser.ArrayCreatorRestContext) ctx;
+        else if(ctx instanceof Java8Parser.ArrayCreatorRestContext) {
+            Java8Parser.ArrayCreatorRestContext arrayCreatorCtx = (Java8Parser.ArrayCreatorRestContext) ctx;
             this.createInitializeCommand(arrayCreatorCtx);
         }
     }
@@ -109,7 +109,7 @@ public class ArrayAnalyze implements ParseTreeListener {
                 String arrayIdentifierString = this.identifiedTokens.getToken(ARRAY_IDENTIFIER_KEY);
 
                 //initialize an array mobivalue
-                this.declaredArray = BaracoArray.createArray(arrayTypeString, arrayIdentifierString);
+                this.declaredArray = javaArray.createArray(arrayTypeString, arrayIdentifierString);
                 BaracoValue baracoValue = new BaracoValue(this.declaredArray, BaracoValue.PrimitiveType.ARRAY);
 
                 this.declaredClassScope.addBaracoValue(accessControlString, arrayIdentifierString, baracoValue);
@@ -124,7 +124,7 @@ public class ArrayAnalyze implements ParseTreeListener {
                 String arrayIdentifierString = this.identifiedTokens.getToken(ARRAY_IDENTIFIER_KEY);
 
                 //initialize an array mobivalue
-                this.declaredArray = BaracoArray.createArray(arrayTypeString, arrayIdentifierString);
+                this.declaredArray = javaArray.createArray(arrayTypeString, arrayIdentifierString);
                 BaracoValue mobiValue = new BaracoValue(this.declaredArray, BaracoValue.PrimitiveType.ARRAY);
 
                 this.localScope.addMobiValue(arrayIdentifierString, mobiValue);
@@ -136,7 +136,7 @@ public class ArrayAnalyze implements ParseTreeListener {
 
     }
 
-    private void createInitializeCommand(BaracoParser.ArrayCreatorRestContext arrayCreatorCtx) {
+    private void createInitializeCommand(Java8Parser.ArrayCreatorRestContext arrayCreatorCtx) {
         ArrayInitializeCommand arrayInitializeCommand = new ArrayInitializeCommand(this.declaredArray, arrayCreatorCtx);
 
         //ExecutionManager.getInstance().addCommand(arrayInitializeCommand);

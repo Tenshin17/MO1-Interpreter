@@ -1,30 +1,43 @@
-package IDE;
-
-import antlr.Java8ErrorListener;
-import antlr.Java8Lexer;
-import antlr.Java8Listener;
-import antlr.Java8Parser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.fife.ui.rtextarea.*;
+import org.fife.ui.rsyntaxtextarea.*;
 
 public class IDE {
     public JToolBar toolBar;
     public JButton btnRun;
     public JButton btnTree;
-    public JLabel labelInput;
-    public static JTextArea txaInput;
-    public static JTextArea txaConsole;
+    public JTextArea txaConsole;
+    public RSyntaxTextArea txaInput;
     public JButton btnClear;
     public JPanel mainPanel;
-    public JTextArea txaOutput;
+    public JScrollPane InputScrollPane;
+    private JPanel IOPanel;
+    private JPanel InputPanel;
+    private JPanel OutputPanel;
+    private JTextArea txaOutput;
+
+    public static final String INPUT_FILE = "src/input.txt";
 
     public IDE() {
+        InputPanel.setLayout(new BorderLayout());
+        txaInput = new RSyntaxTextArea(20, 60);
+        txaInput.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        txaInput.setCodeFoldingEnabled(true);
+        RTextScrollPane sp = new RTextScrollPane(txaInput);
+        InputPanel.add(sp);
 
         btnRun.addActionListener(new ActionListener() {
             @Override
@@ -39,6 +52,7 @@ public class IDE {
 
             }
         });
+
         btnClear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -46,10 +60,6 @@ public class IDE {
                 txaOutput.setText("");
             }
         });
-    }
-
-    public static void printToConsole(String stmt) {
-        txaConsole.append(stmt);
     }
 
     public void run(String srccode){
@@ -1370,46 +1380,6 @@ public class IDE {
                 }
 
                 @Override
-                public void enterPrintStatement(Java8Parser.PrintStatementContext ctx) {
-
-                }
-
-                @Override
-                public void exitPrintStatement(Java8Parser.PrintStatementContext ctx) {
-
-                }
-
-                @Override
-                public void enterPrintExpression(Java8Parser.PrintExpressionContext ctx) {
-
-                }
-
-                @Override
-                public void exitPrintExpression(Java8Parser.PrintExpressionContext ctx) {
-
-                }
-
-                @Override
-                public void enterPrintExtension(Java8Parser.PrintExtensionContext ctx) {
-
-                }
-
-                @Override
-                public void exitPrintExtension(Java8Parser.PrintExtensionContext ctx) {
-
-                }
-
-                @Override
-                public void enterScanStatement(Java8Parser.ScanStatementContext ctx) {
-
-                }
-
-                @Override
-                public void exitScanStatement(Java8Parser.ScanStatementContext ctx) {
-
-                }
-
-                @Override
                 public void enterStatementNoShortIf(Java8Parser.StatementNoShortIfContext ctx) {
 
                 }
@@ -2490,7 +2460,7 @@ public class IDE {
             }
     }
 
-    public static void main(String[] args) {
+    public static void main(String args[]) {
         JFrame frame  = new JFrame("IDE");
         frame.setContentPane(new IDE().mainPanel);
         frame.setBounds(100, 100, 1366, 720);

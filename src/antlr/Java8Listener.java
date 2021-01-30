@@ -1,4 +1,4 @@
-// Generated from C:/Users/Mark Louis S. Lim/Desktop/LECTURES/4th Year Term 1/CMPILER/MO1-Interpreter/src\Java8.g4 by ANTLR 4.9
+package antlr;// Generated from C:/Users/Mark Louis S. Lim/Desktop/LECTURES/4th Year Term 1/CMPILER/MO1-Interpreter/src\Java8.g4 by ANTLR 4.9
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -1316,6 +1316,46 @@ public interface Java8Listener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStatement(Java8Parser.StatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#printStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintStatement(Java8Parser.PrintStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#printStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintStatement(Java8Parser.PrintStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#printExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintExpression(Java8Parser.PrintExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#printExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintExpression(Java8Parser.PrintExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#printExtension}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintExtension(Java8Parser.PrintExtensionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#printExtension}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintExtension(Java8Parser.PrintExtensionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#scanStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterScanStatement(Java8Parser.ScanStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#scanStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitScanStatement(Java8Parser.ScanStatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#statementNoShortIf}.
 	 * @param ctx the parse tree

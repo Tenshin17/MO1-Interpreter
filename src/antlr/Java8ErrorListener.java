@@ -1,7 +1,8 @@
+package antlr;
+
 import org.antlr.v4.runtime.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Java8ErrorListener extends BaseErrorListener {
@@ -50,8 +51,8 @@ public class Java8ErrorListener extends BaseErrorListener {
         //System.err.println("rule stack: "+stack);
         //System.err.println("ERROR: at line "+line+":"+charPositionInLine+" : "+msg);
         String ErrorMessage = "";
-        String errmsgstmt = msg.split("'")[0].toString();
-        String errmsgsymbol = msg.split("'")[1].toString();
+        String errmsgstmt = msg.split("'")[0];
+        String errmsgsymbol = msg.split("'")[1];
         String erroffsymbol = offendingSymbol.toString().split("'")[1];
         //String errmsgsymbol = offSymbol.toString().split("'")[1];
 //        System.out.println("line "+line);
@@ -62,7 +63,7 @@ public class Java8ErrorListener extends BaseErrorListener {
 //        System.out.println("ERROR: at line "+line+":"+charPositionInLine+" : "+msg);
 //        System.out.println("errstmt bool "+errmsgstmt.contains("missing"));
 //        System.out.println("message.contaitns "+ msg.contains("missing"));
-        System.out.println("");
+        System.out.println();
         if(errmsgstmt.contains("missing") || errmsgstmt.contains("cannot find symbol"))//
         {
 

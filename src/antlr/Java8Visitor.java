@@ -1,4 +1,4 @@
-// Generated from C:/Users/Mark Louis S. Lim/Desktop/LECTURES/4th Year Term 1/CMPILER/MO1-Interpreter/src\Java8.g4 by ANTLR 4.9
+package antlr;// Generated from C:/Users/Mark Louis S. Lim/Desktop/LECTURES/4th Year Term 1/CMPILER/MO1-Interpreter/src\Java8.g4 by ANTLR 4.9
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -795,6 +795,30 @@ public interface Java8Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStatement(Java8Parser.StatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link Java8Parser#printStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrintStatement(Java8Parser.PrintStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link Java8Parser#printExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrintExpression(Java8Parser.PrintExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link Java8Parser#printExtension}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrintExtension(Java8Parser.PrintExtensionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link Java8Parser#scanStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitScanStatement(Java8Parser.ScanStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link Java8Parser#statementNoShortIf}.
 	 * @param ctx the parse tree

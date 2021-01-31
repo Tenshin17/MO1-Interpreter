@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2fa2a085-0680-4bca-86f6-f77715a98d95" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Represent/Function.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Represent/Value.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8Lexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8Lexer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8Lexer.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8Parser.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8Parser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8Parser.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8ParserBaseListener.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8ParserBaseVisitor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8ParserListener.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen/Java8ParserVisitor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/IDE.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IDE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Java8Lexer.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Java8Parser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/src/Java8.g4" afterDir="false" />
-    </list>
+    <list default="true" id="2fa2a085-0680-4bca-86f6-f77715a98d95" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -95,6 +79,7 @@
     <option name="width" value="697" />
     <option name="height" value="735" />
   </component>
+  <component name="ProjectId" id="1nqAFlcHpe3urktRT8oJyLfr69i" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -142,15 +127,21 @@
       <pane id="Scope" />
     </panes>
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1611740669723" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/antlr-runtime-4.9.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/rsyntaxtextarea-3.1.2.jar" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
@@ -174,17 +165,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Application.IDE" />
       <item itemvalue="Application.Main" />
@@ -196,6 +176,7 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -218,6 +199,7 @@
       <workItem from="1610548246844" duration="5105000" />
       <workItem from="1610592272936" duration="11784000" />
       <workItem from="1611729841220" duration="3860000" />
+      <workItem from="1612107169110" duration="947000" />
     </task>
     <task id="LOCAL-00001" summary="Upload files">
       <created>1610284566110</created>
@@ -316,7 +298,7 @@
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Upload files" />
@@ -353,8 +335,8 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../SW.g4" />
-    <entry file="file://$USER_HOME$/Downloads/SyntaxErrorListener.java" />
-    <entry file="file://$USER_HOME$/Downloads/SyntaxError.java" />
+    <entry file="file://$PROJECT_DIR$/../../SyntaxErrorListener.java" />
+    <entry file="file://$PROJECT_DIR$/../../SyntaxError.java" />
     <entry file="file://$PROJECT_DIR$/gen/Java8ParserListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">

@@ -1,7 +1,9 @@
+package IDE;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
+import antlr.*;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -1376,6 +1378,46 @@ public class IDE {
 
                 @Override
                 public void exitStatement(Java8Parser.StatementContext ctx) {
+
+                }
+
+                @Override
+                public void enterPrintStatement(Java8Parser.PrintStatementContext ctx) {
+
+                }
+
+                @Override
+                public void exitPrintStatement(Java8Parser.PrintStatementContext ctx) {
+
+                }
+
+                @Override
+                public void enterPrintExpression(Java8Parser.PrintExpressionContext ctx) {
+
+                }
+
+                @Override
+                public void exitPrintExpression(Java8Parser.PrintExpressionContext ctx) {
+
+                }
+
+                @Override
+                public void enterPrintExtension(Java8Parser.PrintExtensionContext ctx) {
+
+                }
+
+                @Override
+                public void exitPrintExtension(Java8Parser.PrintExtensionContext ctx) {
+
+                }
+
+                @Override
+                public void enterScanStatement(Java8Parser.ScanStatementContext ctx) {
+
+                }
+
+                @Override
+                public void exitScanStatement(Java8Parser.ScanStatementContext ctx) {
 
                 }
 

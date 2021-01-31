@@ -737,7 +737,27 @@ statement
 	|	ifThenElseStatement
 	|	whileStatement
 	|	forStatement
+	|   printStatement
+	|   scanStatement
 	;
+
+printStatement
+    :   PRINT '(' printExpression ')' ';'
+    |   PRINTLN '(' printExpression ')' ';'
+    ;
+
+printExpression
+    :   printExtension ( '+' printExtension )*
+    ;
+
+printExtension
+    :   Identifier
+    |   StringLiteral
+    ;
+
+scanStatement
+    :   SCAN '(' StringLiteral ',' Identifier')' ';'
+    ;
 
 statementNoShortIf
 	:	statementWithoutTrailingSubstatement
@@ -1392,6 +1412,9 @@ TRY : 'try';
 VOID : 'void';
 VOLATILE : 'volatile';
 WHILE : 'while';
+PRINT : 'print';
+PRINTLN : 'println';
+SCAN : 'scan';
 
 // §3.10.1 Integer Literals
 

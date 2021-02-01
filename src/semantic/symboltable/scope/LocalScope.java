@@ -104,8 +104,8 @@ public class LocalScope implements IScope {
 	public void addEmptyVariableFromKeywords(String primitiveTypeString, String identifierString) {
 		this.initializeLocalVariableMap();
 
-		JavaValue baracoValue = JavaValue.createEmptyVariableFromKeywords(primitiveTypeString);
-		this.localVariables.put(identifierString, baracoValue);
+		JavaValue javaValue = JavaValue.createEmptyVariableFromKeywords(primitiveTypeString);
+		this.localVariables.put(identifierString, javaValue);
 	}
 
 	/*
@@ -115,30 +115,30 @@ public class LocalScope implements IScope {
 		this.initializeLocalVariableMap();
 
 		this.addEmptyVariableFromKeywords(primitiveTypeString, identifierString);
-		JavaValue baracoValue = this.localVariables.get(identifierString);
-		baracoValue.setValue(valueString);
+		JavaValue javaValue = this.localVariables.get(identifierString);
+		javaValue.setValue(valueString);
 	}
 
 	public void addFinalEmptyVariableFromKeywords(String primitiveTypeString, String identifierString) {
 		this.initializeLocalVariableMap();
 
-		JavaValue baracoValue = JavaValue.createEmptyVariableFromKeywords(primitiveTypeString);
-		baracoValue.markFinal();
-		this.localVariables.put(identifierString, baracoValue);
+		JavaValue javaValue = JavaValue.createEmptyVariableFromKeywords(primitiveTypeString);
+		javaValue.markFinal();
+		this.localVariables.put(identifierString, javaValue);
 	}
 
 	public void addFinalInitVariableFromKeyWords(String primitiveTypeString, String identifierString, String valueString) {
 		this.initializeLocalVariableMap();
 
 		this.addEmptyVariableFromKeywords(primitiveTypeString, identifierString);
-		JavaValue baracoValue = this.localVariables.get(identifierString);
-		baracoValue.setValue(valueString);
-		baracoValue.markFinal();
+		JavaValue javaValue = this.localVariables.get(identifierString);
+		javaValue.setValue(valueString);
+		javaValue.markFinal();
 	}
 
-	public void addJavaValue(String identifier, JavaValue baracoValue) {
+	public void addJavaValue(String identifier, JavaValue javaValue) {
 		this.initializeLocalVariableMap();
-		this.localVariables.put(identifier, baracoValue);
+		this.localVariables.put(identifier, javaValue);
 	}
 
 	/*

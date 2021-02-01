@@ -20,7 +20,7 @@ public class FunctionTracker {
 	}
 	
 	private FunctionTracker() {
-		callStack = new Stack<>();
+		this.callStack = new Stack<>();
 	}
 	
 	public static void initialize() {
@@ -32,22 +32,22 @@ public class FunctionTracker {
 	}
 	
 	public void reportEnterFunction(JavaMethod javaMethod) {
-		callStack.push(javaMethod);
+		this.callStack.push(javaMethod);
 	}
 	
 	public void reportExitFunction() {
-		callStack.pop();
+		this.callStack.pop();
 	}
 	
 	public JavaMethod getLatestFunction() {
-		return callStack.peek();
+		return this.callStack.peek();
 	}
 	
 	/*
 	 * Returns true if the control flow is currently inside a function
 	 */
 	public boolean isInsideFunction() {
-		return (callStack.size() != 0);
+		return (this.callStack.size() != 0);
 	}
 	
 }

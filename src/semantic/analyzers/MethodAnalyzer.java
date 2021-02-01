@@ -29,11 +29,11 @@ public class MethodAnalyzer implements ParseTreeListener {
 	public MethodAnalyzer(IdentifiedTokens identifiedTokens, ClassScope declaredClassScope) {
 		this.identifiedTokens = identifiedTokens;
 		this.declaredClassScope = declaredClassScope;
-		declaredJavaMethod = new JavaMethod();
+		this.declaredJavaMethod = new JavaMethod();
 	}
 	
 	public void analyze(MethodDeclarationContext ctx) {
-		ExecutionManager.getExecutionManager().openFunctionExecution(declaredJavaMethod);
+		ExecutionManager.getExecutionManager().openFunctionExecution(this.declaredJavaMethod);
 		
 		ParseTreeWalker treeWalker = new ParseTreeWalker();
 		treeWalker.walk(this, ctx);
@@ -58,10 +58,10 @@ public class MethodAnalyzer implements ParseTreeListener {
 			MultipleFuncDecChecker funcDecChecker = new MultipleFuncDecChecker(methodDecCtx);
 			funcDecChecker.verify();
 			
-			analyzeIdentifier(methodDecCtx.methodHeader().methodDeclarator().Identifier()); //get the function identifier
+			this.analyzeIdentifier(methodDecCtx.methodHeader().methodDeclarator().Identifier()); //get the function identifier
 		}
 		else {
-			analyzeMethod(ctx);
+			this.analyzeMethod(ctx);
 		}
 		
 	}
@@ -81,7 +81,7 @@ public class MethodAnalyzer implements ParseTreeListener {
 			//return type is a primitive type
 			if(typeCtx.unannPrimitiveType() != null) {
 				UnannPrimitiveTypeContext primitiveTypeCtx = typeCtx.unannPrimitiveType();
-				declaredJavaMethod.setReturnType(JavaMethod.identifyFunctionType(primitiveTypeCtx.getText()));
+				this.declaredJavaMethod.setReturnType(JavaMethod.identifyFunctionType(primitiveTypeCtx.getText()));
 			}
 			//return type is a string or a class type
 			else {
@@ -91,15 +91,15 @@ public class MethodAnalyzer implements ParseTreeListener {
 		
 		else if(ctx instanceof FormalParameterListContext) {
 			FormalParameterListContext formalParamsCtx = (FormalParameterListContext) ctx;
-			analyzeParameters(formalParamsCtx);
-			storeJavaMethod();
+			this.analyzeParameters(formalParamsCtx);
+			this.storeJavaMethod();
 		}
 		
 		else if(ctx instanceof MethodBodyContext) {
 			BlockContext blockCtx = ((MethodBodyContext) ctx).block();
 			
 			BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
-			declaredJavaMethod.setParentLocalScope(LocalScopeCreator.getInstance().getActiveLocalScope());
+			this.declaredJavaMethod.setParentLocalScope(LocalScopeCreator.getInstance().getActiveLocalScope());
 			blockAnalyzer.analyze(blockCtx.blockStatements());
 			
 		}
@@ -108,7 +108,7 @@ public class MethodAnalyzer implements ParseTreeListener {
 	private void analyzeClassOrInterfaceType(UnannClassOrInterfaceTypeContext classOrInterfaceCtx) {
 		//a string identified
 		if(classOrInterfaceCtx.getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
-			declaredJavaMethod.setReturnType(FunctionType.STRING_TYPE);
+			this.declaredJavaMethod.setReturnType(FunctionType.STRING_TYPE);
 		}
 		//a class identified
 		else {
@@ -117,7 +117,7 @@ public class MethodAnalyzer implements ParseTreeListener {
 	}
 	
 	private void analyzeIdentifier(TerminalNode identifier) {
-		declaredJavaMethod.setFunctionName(identifier.getText());
+		this.declaredJavaMethod.setFunctionName(identifier.getText());
 	}
 	
 	private void analyzeParameters(FormalParameterListContext formalParamsCtx) {
@@ -132,19 +132,19 @@ public class MethodAnalyzer implements ParseTreeListener {
 	 */
 	private void storeJavaMethod() {
 		if(this.identifiedTokens.containsTokens(ClassAnalyzer.ACCESS_CONTROL_KEY)) {
-			String accessToken = identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
+			String accessToken = this.identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
 			
 			if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PRIVATE, accessToken)) {
-				declaredClassScope.addPrivateJavaMethod(declaredJavaMethod.getFunctionName(), declaredJavaMethod);
+				this.declaredClassScope.addPrivateJavaMethod(this.declaredJavaMethod.getFunctionName(), this.declaredJavaMethod);
 			}
 			else if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PUBLIC, accessToken)) {
-				declaredClassScope.addPublicJavaMethod(declaredJavaMethod.getFunctionName(), declaredJavaMethod);
+				this.declaredClassScope.addPublicJavaMethod(this.declaredJavaMethod.getFunctionName(), this.declaredJavaMethod);
 			}
 			
-			identifiedTokens.clearTokens(); //clear tokens for reuse
+			this.identifiedTokens.clearTokens(); //clear tokens for reuse
 		}
-		declaredClassScope.addPublicJavaMethod(declaredJavaMethod.getFunctionName(), declaredJavaMethod);
-		identifiedTokens.clearTokens(); //clear tokens for reuse
+		this.declaredClassScope.addPublicJavaMethod(declaredJavaMethod.getFunctionName(), declaredJavaMethod);
+		this.identifiedTokens.clearTokens(); //clear tokens for reuse
 	}
 
 }

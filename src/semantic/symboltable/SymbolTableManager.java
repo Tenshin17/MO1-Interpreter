@@ -31,12 +31,12 @@ public class SymbolTableManager {
 	}
 	
 	public void addClassScope(String className, ClassScope classScope) {
-		classTable.put(className, classScope);
+		this.classTable.put(className, classScope);
 	}
 	
 	public ClassScope getClassScope(String className) {
 		if(containsClassScope(className)) {
-			return classTable.get(className);
+			return this.classTable.get(className);
 		}
 		else {
 			System.err.println("SymbolTableManager: " + className + " is not found!");
@@ -45,11 +45,11 @@ public class SymbolTableManager {
 	}
 	
 	public boolean containsClassScope(String className) {
-		return classTable.containsKey(className);
+		return this.classTable.containsKey(className);
 	}
 	
 	public void resetClassTables() {
-		ClassScope[] classScopes = classTable.values().toArray(new ClassScope[classTable.size()]);
+		ClassScope[] classScopes = this.classTable.values().toArray(new ClassScope[this.classTable.size()]);
 
 		for (ClassScope classScope : classScopes) {
 			classScope.resetValues();

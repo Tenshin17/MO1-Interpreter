@@ -34,8 +34,8 @@ public class ExecutionManager{
 	private MainExecutionAdder mainExecutionAdder;
 	
 	private ExecutionManager() {
-		mainExecutionAdder = new MainExecutionAdder(executionList);
-		activeExecutionAdder = mainExecutionAdder;
+		this.mainExecutionAdder = new MainExecutionAdder(this.executionList);
+		this.activeExecutionAdder = this.mainExecutionAdder;
 	}
 	
 	public static void initialize() {
@@ -58,44 +58,44 @@ public class ExecutionManager{
 	}
 	
 	public boolean hasFoundEntryPoint() {
-		return foundEntryPoint;
+		return this.foundEntryPoint;
 	}
 	
 	public String getEntryClassName() {
-		return entryClassName;
+		return this.entryClassName;
 	}
 	
 	public void addCommand(ICommand command) {
-		activeExecutionAdder.addCommand(command);
+		this.activeExecutionAdder.addCommand(command);
 	}
 	
 	/*
 	 * Deletes a command from the main control flow
 	 */
 	public void deleteCommand(ICommand command) {
-		executionList.remove(command);
+		this.executionList.remove(command);
 	}
 	
 	/*
 	 * Opens a function. Any succeeding commands to be added will be put to the function control flow.
 	 */
 	public void openFunctionExecution(JavaMethod javaMethod) {
-		activeExecutionAdder = new FunctionExecutionAdder(javaMethod);
+		this.activeExecutionAdder = new FunctionExecutionAdder(javaMethod);
 	}
 	
 	/*
 	 * Returns true if the execution manager currently points to a function control flow.
 	 */
 	public boolean isInFunctionExecution() {
-		return (activeExecutionAdder instanceof FunctionExecutionAdder);
+		return (this.activeExecutionAdder instanceof FunctionExecutionAdder);
 	}
 	
 	/*
 	 * Returns the current function that the execution manager is populating.
 	 */
 	public JavaMethod getCurrentFunction() {
-		if(isInFunctionExecution()) {
-			FunctionExecutionAdder functionExecAdder = (FunctionExecutionAdder) activeExecutionAdder;
+		if(this.isInFunctionExecution()) {
+			FunctionExecutionAdder functionExecAdder = (FunctionExecutionAdder) this.activeExecutionAdder;
 			
 			return functionExecAdder.getAssignedFunction();
 		}
@@ -109,21 +109,21 @@ public class ExecutionManager{
 	 * Closes a function. Control flow will be given back to the main execution adder.
 	 */
 	public void closeFunctionExecution() {
-		activeExecutionAdder = mainExecutionAdder;
+		this.activeExecutionAdder = this.mainExecutionAdder;
 	}
 	
 	/*
 	 * Blocks the execution of the thread. Can only be called once. At this point, resumeExecution() must be called by a specific command.
 	 */
 	public void blockExecution() {
-		executionMonitor.claimExecutionFlag();
+		this.executionMonitor.claimExecutionFlag();
 	}
 	
 	/*
 	 * Resumes the execution of thread. Can only be called once. At this point, the execution thread should continue to do other actions.
 	 */
 	public void resumeExecution() {
-		executionMonitor.releaseExecutionFlag();
+		this.executionMonitor.releaseExecutionFlag();
 	}
 	
 	/*
@@ -131,20 +131,20 @@ public class ExecutionManager{
 	 * This causes the execution thread to temporarily halt until released.
 	 */
 	public void executeAllActions() {
-		executionMonitor = new ExecutionMonitor();
-		executionThread = new ExecutionThread(executionList, executionMonitor);
-		executionThread.start();
+		this.executionMonitor = new ExecutionMonitor();
+		this.executionThread = new ExecutionThread(this.executionList, this.executionMonitor);
+		this.executionThread.start();
 	}
 	
 	public void clearAllActions() {
-		executionList.clear();
+		this.executionList.clear();
 	}
 	
 	/*
 	 * Gets the execution monitor. This is used for controlled commands that also needs to check prior to execution.
 	 */
 	public ExecutionMonitor getExecutionMonitor() {
-		return executionMonitor;
+		return this.executionMonitor;
 	}
 
 }

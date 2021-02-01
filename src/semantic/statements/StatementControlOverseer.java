@@ -28,7 +28,7 @@ public class StatementControlOverseer {
 	private boolean isInPositive = true; //used for conditional statements to indicate if the series of commands should go to the positive command list.
 	
 	private StatementControlOverseer() {
-		procedureCallStack = new Stack<>();
+		this.procedureCallStack = new Stack<>();
 		
 		System.err.println("StatementControlOverseer: Stack initialized!");
 	}
@@ -43,15 +43,15 @@ public class StatementControlOverseer {
 	}
 	
 	public void openConditionalCommand(ICondCommand command) {
-		if(procedureCallStack.isEmpty()) {
-			procedureCallStack.push(command);
-			activeControlledCommand = command;
+		if(this.procedureCallStack.isEmpty()) {
+			this.procedureCallStack.push(command);
+			this.activeControlledCommand = command;
 		}
 		else {
-			processAdditionOfCommand(command);
+			this.processAdditionOfCommand(command);
 		}
 		
-		isInPositive = true;
+		this.isInPositive = true;
 		
 	}
 	
@@ -59,16 +59,16 @@ public class StatementControlOverseer {
 	 * Opens a new controlled command
 	 */
 	public void openControlledCommand(ICtrlCommand command) {
-		procedureCallStack.push(command);
-		activeControlledCommand = command;
+		this.procedureCallStack.push(command);
+		this.activeControlledCommand = command;
 	}
 	
 	public boolean isInPositiveRule() {
-		return isInPositive;
+		return this.isInPositive;
 	}
 	
 	public void reportExitPositiveRule() {
-		isInPositive = false;
+		this.isInPositive = false;
 	}
 	
 	/*
@@ -78,29 +78,29 @@ public class StatementControlOverseer {
 		
 		//if the current active controlled command is that of a conditional command,
 		//we either add the newly opened command as either positive or a negative command
-		if(isInConditionalCommand()) {
-			ICondCommand conditionalCommand = (ICondCommand) activeControlledCommand;
+		if(this.isInConditionalCommand()) {
+			ICondCommand conditionalCommand = (ICondCommand) this.activeControlledCommand;
 			
-			if(isInPositiveRule()) {
+			if(this.isInPositiveRule()) {
 				conditionalCommand.addPositiveCommand(command);
 			}
 			else {
 				conditionalCommand.addNegativeCommand(command);
 			}
 			
-			procedureCallStack.push(command);
-			activeControlledCommand = command;
+			this.procedureCallStack.push(command);
+			this.activeControlledCommand = command;
 		}
 		//just add the newly opened command as a command under the last active controlled command.
 		else {
 			
-			ICtrlCommand controlledCommand = (ICtrlCommand) activeControlledCommand;
+			ICtrlCommand controlledCommand = (ICtrlCommand) this.activeControlledCommand;
 			controlledCommand.addCommand(command);
 
 			ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Adding command to " + controlledCommand.getControlType()));
 			
-			procedureCallStack.push(command);
-			activeControlledCommand = command;
+			this.procedureCallStack.push(command);
+			this.activeControlledCommand = command;
 		}
 	}
 	
@@ -112,17 +112,17 @@ public class StatementControlOverseer {
 	public void compileControlledCommand() {
 		
 		//we arrived at the root node, therefore we add this now to the execution manager
-		if(procedureCallStack.size() == 1) {
-			ICommand rootCommand = procedureCallStack.pop();
+		if(this.procedureCallStack.size() == 1) {
+			ICommand rootCommand = this.procedureCallStack.pop();
 			ExecutionManager.getExecutionManager().addCommand(rootCommand);
 			
-			activeControlledCommand = null;
+			this.activeControlledCommand = null;
 		}
 		//we pop then add it to the next root node
-		else if(procedureCallStack.size() > 1) {
-			ICommand childCommand = procedureCallStack.pop();
-			ICommand parentCommand = procedureCallStack.peek();
-			activeControlledCommand = parentCommand;
+		else if(this.procedureCallStack.size() > 1) {
+			ICommand childCommand = this.procedureCallStack.pop();
+			ICommand parentCommand = this.procedureCallStack.peek();
+			this.activeControlledCommand = parentCommand;
 			
 			if(parentCommand instanceof ICtrlCommand) {
 				ICtrlCommand controlledCommand = (ICtrlCommand) parentCommand;
@@ -136,14 +136,14 @@ public class StatementControlOverseer {
 	}
 	
 	public boolean isInConditionalCommand() {
-		return (activeControlledCommand != null && activeControlledCommand instanceof ICondCommand);
+		return (this.activeControlledCommand != null && this.activeControlledCommand instanceof ICondCommand);
 	}
 	
 	public boolean isInControlledCommand() {
-		return (activeControlledCommand!= null && activeControlledCommand instanceof ICtrlCommand);
+		return (this.activeControlledCommand!= null && this.activeControlledCommand instanceof ICtrlCommand);
 	}
 	
 	public ICommand getActiveControlledCommand() {
-		return activeControlledCommand;
+		return this.activeControlledCommand;
 	}
 }

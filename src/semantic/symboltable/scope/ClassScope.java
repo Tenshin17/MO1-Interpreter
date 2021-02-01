@@ -87,14 +87,14 @@ public class ClassScope implements IScope {
 		this.addEmptyVariableFromKeywords(classModifierString, primitiveTypeString, identifierString);
 
 		if(isPublic) {
-			JavaValue baracoValue = this.publicVariables.get(identifierString);
-			baracoValue.setValue(valueString);
-			System.out.println("Updated public variable " +identifierString+ " of type " +baracoValue.getPrimitiveType()+ " with value " +valueString);
+			JavaValue javaValue = this.publicVariables.get(identifierString);
+			javaValue.setValue(valueString);
+			System.out.println("Updated public variable " +identifierString+ " of type " +javaValue.getPrimitiveType()+ " with value " +valueString);
 		}
 		else {
-			JavaValue baracoValue = this.privateVariables.get(identifierString);
-			baracoValue.setValue(valueString);
-			System.out.println("Updated private variable " +identifierString+ " of type " +baracoValue.getPrimitiveType()+ " with value " +valueString);
+			JavaValue javaValue = this.privateVariables.get(identifierString);
+			javaValue.setValue(valueString);
+			System.out.println("Updated private variable " +identifierString+ " of type " +javaValue.getPrimitiveType()+ " with value " +valueString);
 		}
 	}
 
@@ -118,19 +118,19 @@ public class ClassScope implements IScope {
 		}
 	}
 
-	public void addPrivateJavaMethod(String identifier, JavaMethod baracoMethod) {
-		this.privateMethods.put(identifier, baracoMethod);
-		System.out.println("Created private function " +identifier+ " with return type " + baracoMethod.getReturnType());
+	public void addPrivateJavaMethod(String identifier, JavaMethod javaMethod) {
+		this.privateMethods.put(identifier, javaMethod);
+		System.out.println("Created private function " +identifier+ " with return type " + javaMethod.getReturnType());
 		MethodList.getInstance().addMethodName(identifier);
 	}
 
-	public void addPublicJavaMethod(String identifier, JavaMethod baracoMethod) {
-		this.publicMethods.put(identifier, baracoMethod);
-		System.out.println("Created public function " +identifier+ " with return type " + baracoMethod.getReturnType());
+	public void addPublicJavaMethod(String identifier, JavaMethod javaMethod) {
+		this.publicMethods.put(identifier, javaMethod);
+		System.out.println("Created public function " +identifier+ " with return type " + javaMethod.getReturnType());
 		MethodList.getInstance().addMethodName(identifier);
 	}
 
-	public void addJavaValue(String accessControlModifier, String identifier, JavaValue baracoValue) {
+	public void addJavaValue(String accessControlModifier, String identifier, JavaValue javaValue) {
 		boolean isPublic = true;
 
 		if(RecognizedKeywords.matchesKeyword(RecognizedKeywords.CLASS_MODIFIER_PRIVATE, accessControlModifier)) {
@@ -138,10 +138,10 @@ public class ClassScope implements IScope {
 		}
 
 		if(isPublic){
-			this.publicVariables.put(identifier, baracoValue);
+			this.publicVariables.put(identifier, javaValue);
 		}
 		else {
-			this.privateVariables.put(identifier, baracoValue);
+			this.privateVariables.put(identifier, javaValue);
 		}
 	}
 

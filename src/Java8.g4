@@ -752,7 +752,7 @@ printExpression
 
 printExtension
     :   Identifier
-    |   StringLiteral
+    |   literal
     ;
 
 scanStatement

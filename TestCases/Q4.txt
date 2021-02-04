@@ -1,0 +1,22 @@
+public class Main
+{
+	public static void main(String[] args) {
+		int anum=0;
+		int bnum=0;
+		int cnum=0;
+		int dnum=0;
+		int fnum=0;
+		
+		scan("Enter FIRST number: ",anum);
+		scan("Enter SECOND number: ",bnum);
+		scan("Enter THIRD number: ",cnum);
+		scan("Enter FOURTH number: ",dnum);
+		scan("Enter FIFTH number: ",fnum);
+	    
+	    println(fnum);
+	    println(dnum);
+	    println(cnum);
+	    println(bnum);
+	    println(anum);
+	}
+}

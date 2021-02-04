@@ -1,0 +1,47 @@
+public class Main
+{
+	public static void main(String[] args) {
+		final float MULTIPLIER = 2.0;
+		final float DIVIDER = 1.5;
+int x=0;
+int y=0;
+int z=0;
+x+=4;
+y+=5;
+z+=6;
+
+		float finalValue = (((x+y)*MULTIPLIER)/DIVIDER+x+y)-y*MULTIPLIER;
+ 		float finalval= finalValue*MULTIPLIER*MULTIPLIER;
+		println("Value is: "+finalval);
+	}
+}
+//int x=0;
+//int y=0;
+//int z=0;
+//x+=4;
+//y+=5;
+//z+=6;
+
+
+//int x=2;
+//int y=2;
+//int z=2;
+//x+=1;
+//y+=1;
+//z+=1;
+
+
+//int x=-1;
+//int y=-2;
+//int z=-3;
+//x+=-1;
+//y+=-2;
+//z+=-3;
+
+
+//int x=1;
+//int y=1;
+//int z= x+1;
+//x+=(x+z);
+//y+=1;
+//z+=1;

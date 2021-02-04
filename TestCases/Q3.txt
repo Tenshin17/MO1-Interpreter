@@ -1,0 +1,14 @@
+public class Main
+{
+	public static void main(String[] args) {
+		String fname="";
+		String mname="";
+		String lname="";
+		
+		scan("Enter FIRST name: ",fname);
+		scan("Enter MIDDLE name: ",mname);
+	    scan("Enter LAST name: ",lname);
+	    
+	    print("Welcome "+ fname +" "+ mname+" "+lname+"!" );
+	}
+}

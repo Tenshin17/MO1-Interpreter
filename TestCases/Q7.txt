@@ -1,0 +1,123 @@
+public class Main{
+
+	void main(){
+
+		int num;
+		int temp=0;
+		int s;
+		int r;
+
+		scan("Enter Table Size: ", num);
+
+		
+		print("   ");
+		for(int i=1; i<=num; i++){
+			print(i+ " " );
+		}
+
+		println("");
+
+		if(temp < num){
+			s = temp+1;
+			print( s + " ");
+			for(int j=1; j<=num; j++){
+				r = s * j;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+
+		println("");
+
+		if(temp< num){
+			s = temp+1;
+			print( s + " ");
+			for(int k=1; k<=num; k++){
+				r = s * k;
+				print(r+" ");
+
+			}
+			temp++;
+		}
+		
+	}
+	
+}

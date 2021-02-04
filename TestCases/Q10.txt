@@ -1,0 +1,72 @@
+public class Main
+{
+	public static void main(String[] args) {
+		String str="";
+		int size =0;
+		boolean isError=true;
+		scan("Enter char: ",str);
+		scan("Enter font size: ", size);
+
+ 		if(size <5)
+ 		{
+ 			print("INVALID! Font size should be atleast 5");
+ 			isError=false;
+ 		}
+ 	
+ 		
+ 		if(size>=5)
+ 		{
+	 		if(str=="F")
+	 		{
+				int temp = size/2;
+				println("*****");
+				for(int i=0;i<temp-1;i++)
+				{
+					println("*");
+				}
+				println("*****");
+				for(int i=0;i<temp;i++)
+				{
+					println("*");
+				}
+				isError=false;
+	 		}
+	 		
+ 		}
+
+ 		if(size>=5)
+ 		{	
+			if(str =="T")
+			{
+				println("*****");
+				for(int i=0;i<size-1;i++)
+				{
+					println("  *");
+				}
+				isError=false;
+			}
+			
+ 		}
+ 		
+ 		if(size>=5)
+ 		{
+	
+			if(str=="L")
+			{
+				for(int i=0;i<size-1;i++)
+				{
+					println("*");
+				}
+				println("*****");
+				isError=false;
+		 	}
+		 	
+ 		}
+
+ 		if(isError)
+ 		{
+ 			print("INVALID! Only supports 'FTL'. Please try again");
+ 		}
+
+		}
+}

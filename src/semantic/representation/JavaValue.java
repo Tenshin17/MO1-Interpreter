@@ -44,27 +44,32 @@ public class JavaValue {
 		this.primitiveType = primitiveType;
 	}
 	
-	public void reset() { value = defaultValue;
+	public void reset() { this.value = this.defaultValue;
 	}
 	
 	/*
 	 * Marks this value as final if there is a final keyword
 	 */
 	public void markFinal() {
-		finalFlag = true;
+		this.finalFlag = true;
 	}
 	
 	public boolean isFinal() {
-		return finalFlag;
+		return this.finalFlag;
 	}
 	
 	public void setValue(String value) {
 		
-		if(primitiveType == PrimitiveType.NOT_YET_IDENTIFIED) {
+		if(this.primitiveType == PrimitiveType.NOT_YET_IDENTIFIED) {
 			System.err.println("JavaValue: " +  "Primitive type not yet identified!");
 		}
-		else if(primitiveType == PrimitiveType.ARRAY) {
-			System.err.println("JavaValue: " +  primitiveType + " is an array. Cannot directly change value.");
+		else if(this.primitiveType == PrimitiveType.STRING) {
+			value.replace("\"", "");
+
+			this.value = value.replace("\"", "");
+		}
+		else if(this.primitiveType == PrimitiveType.ARRAY) {
+			System.err.println("JavaValue: " +  this.primitiveType + " is an array. Cannot directly change value.");
 		}
 		else {
 			//attempts to type cast the value
@@ -89,11 +94,11 @@ public class JavaValue {
 	}
 	
 	public Object getValue() {
-		return value;
+		return this.value;
 	}
 	
 	public PrimitiveType getPrimitiveType() {
-		return primitiveType;
+		return this.primitiveType;
 	}
 
 	

@@ -35,7 +35,7 @@ public class ParameterAnalyzer implements ParseTreeListener {
 	}
 	
 	public void analyze(FormalParameterListContext ctx) {
-		identifiedTokens = new IdentifiedTokens();
+		this.identifiedTokens = new IdentifiedTokens();
 		
 		ParseTreeWalker treeWalker = new ParseTreeWalker();
 		treeWalker.walk(this, ctx);

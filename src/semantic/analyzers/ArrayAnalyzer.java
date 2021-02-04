@@ -1,5 +1,8 @@
 package semantic.analyzers;
 
+import Execution.command.ICondCommand;
+import Execution.command.ICtrlCommand;
+import antlr.Java8Parser;
 import antlr.Java8Parser.DimExprContext;
 import antlr.Java8Parser.PrimitiveTypeContext;
 import antlr.Java8Parser.VariableDeclaratorIdContext;
@@ -9,6 +12,7 @@ import Execution.command.evaluation.ArrayInitCom;
 import semantic.representation.JavaArray;
 import semantic.representation.JavaValue;
 import semantic.representation.JavaValue.PrimitiveType;
+import semantic.statements.StatementControlOverseer;
 import semantic.symboltable.scope.ClassScope;
 import semantic.symboltable.scope.LocalScope;
 import semantic.utils.IdentifiedTokens;
@@ -64,19 +68,19 @@ public class ArrayAnalyzer implements ParseTreeListener {
 	public void enterEveryRule(ParserRuleContext ctx) {
 		if(ctx instanceof PrimitiveTypeContext) {
 			PrimitiveTypeContext primitiveCtx = (PrimitiveTypeContext) ctx;
-			identifiedTokens.addToken(ARRAY_PRIMITIVE_KEY, primitiveCtx.getText());
+			this.identifiedTokens.addToken(ARRAY_PRIMITIVE_KEY, primitiveCtx.getText());
 			ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Array created name: " +primitiveCtx.getText()));
 		}
 		else if(ctx instanceof VariableDeclaratorIdContext) {
 			VariableDeclaratorIdContext varDecIdCtx = (VariableDeclaratorIdContext) ctx;
-			identifiedTokens.addToken(ARRAY_IDENTIFIER_KEY, varDecIdCtx.getText());
 			MultipleVarDecChecker multipleVarDecChecker = new MultipleVarDecChecker(varDecIdCtx);
 			multipleVarDecChecker.verify();
-			analyzeArray();
+			this.identifiedTokens.addToken(ARRAY_IDENTIFIER_KEY, varDecIdCtx.getText());
+			this.analyzeArray();
 		}
 		else if(ctx instanceof DimExprContext) {
 			DimExprContext arrayCreatorCtx = (DimExprContext) ctx;
-			createInitializeCommand(arrayCreatorCtx);
+			this.createInitializeCommand(arrayCreatorCtx);
 		}
 	}
 
@@ -87,44 +91,64 @@ public class ArrayAnalyzer implements ParseTreeListener {
 	
 	private void analyzeArray() {
 		
-		if(declaredClassScope != null) {
-			if(identifiedTokens.containsTokens(ClassAnalyzer.ACCESS_CONTROL_KEY, ARRAY_PRIMITIVE_KEY, ARRAY_IDENTIFIER_KEY)) {
-				String accessControlString = identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
-				String arrayTypeString = identifiedTokens.getToken(ARRAY_PRIMITIVE_KEY);
-				String arrayIdentifierString = identifiedTokens.getToken(ARRAY_IDENTIFIER_KEY);
+		if(this.declaredClassScope != null) {
+			if(this.identifiedTokens.containsTokens(ClassAnalyzer.ACCESS_CONTROL_KEY, ARRAY_PRIMITIVE_KEY, ARRAY_IDENTIFIER_KEY)) {
+				String accessControlString = this.identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
+				String arrayTypeString = this.identifiedTokens.getToken(ARRAY_PRIMITIVE_KEY);
+				String arrayIdentifierString = this.identifiedTokens.getToken(ARRAY_IDENTIFIER_KEY);
 				
 				//initialize an array javaValue
-				declaredArray = JavaArray.createArray(arrayTypeString, arrayIdentifierString);
-				JavaValue javaValue = new JavaValue(declaredArray, PrimitiveType.ARRAY);
+				this.declaredArray = JavaArray.createArray(arrayTypeString, arrayIdentifierString);
+				JavaValue javaValue = new JavaValue(this.declaredArray, PrimitiveType.ARRAY);
 				
-				declaredClassScope.addJavaValue(accessControlString, arrayIdentifierString, javaValue);
+				this.declaredClassScope.addJavaValue(accessControlString, arrayIdentifierString, javaValue);
 				ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Creating array with type " +
 						arrayTypeString+ " variable " +arrayIdentifierString));
 				
-				identifiedTokens.clearTokens();
+				this.identifiedTokens.clearTokens();
 			}
 		}
-		else if(localScope != null) {
-			if(identifiedTokens.containsTokens(ARRAY_PRIMITIVE_KEY, ARRAY_IDENTIFIER_KEY)) {
-				String arrayTypeString = identifiedTokens.getToken(ARRAY_PRIMITIVE_KEY);
-				String arrayIdentifierString = identifiedTokens.getToken(ARRAY_IDENTIFIER_KEY);
+		else if(this.localScope != null) {
+			if(this.identifiedTokens.containsTokens(ARRAY_PRIMITIVE_KEY, ARRAY_IDENTIFIER_KEY)) {
+				String arrayTypeString = this.identifiedTokens.getToken(ARRAY_PRIMITIVE_KEY);
+				String arrayIdentifierString = this.identifiedTokens.getToken(ARRAY_IDENTIFIER_KEY);
 				
 				//initialize an array javaValue
-				declaredArray = JavaArray.createArray(arrayTypeString, arrayIdentifierString);
-				JavaValue javaValue = new JavaValue(declaredArray, PrimitiveType.ARRAY);
+				this.declaredArray = JavaArray.createArray(arrayTypeString, arrayIdentifierString);
+				JavaValue javaValue = new JavaValue(this.declaredArray, PrimitiveType.ARRAY);
 				
 				localScope.addJavaValue(arrayIdentifierString, javaValue);
 				ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Creating array with type " +
 						arrayTypeString+ " variable " +arrayIdentifierString));
 				
-				identifiedTokens.clearTokens();
+				this.identifiedTokens.clearTokens();
 			}
 		}
 		
 	}
 	
 	private void createInitializeCommand(DimExprContext arrayCreatorCtx) {
-		ArrayInitCom arrayInitializeCommand = new ArrayInitCom(declaredArray, arrayCreatorCtx);
-		ExecutionManager.getExecutionManager().addCommand(arrayInitializeCommand);
+		ArrayInitCom arrayInitializeCommand = new ArrayInitCom(this.declaredArray, arrayCreatorCtx);
+		StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+
+		//add to conditional controlled command
+		if(statementControl.isInConditionalCommand()) {
+			ICondCommand conditionalCommand = (ICondCommand) statementControl.getActiveControlledCommand();
+
+			if(statementControl.isInPositiveRule()) {
+				conditionalCommand.addPositiveCommand(arrayInitializeCommand);
+			}
+			else {
+				conditionalCommand.addNegativeCommand(arrayInitializeCommand);
+			}
+		}
+
+		else if(statementControl.isInControlledCommand()) {
+			ICtrlCommand controlledCommand = (ICtrlCommand) statementControl.getActiveControlledCommand();
+			controlledCommand.addCommand(arrayInitializeCommand);
+		}
+		else {
+			ExecutionManager.getExecutionManager().addCommand(arrayInitializeCommand);
+		}
 	}
 }

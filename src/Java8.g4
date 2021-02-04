@@ -753,6 +753,7 @@ printExpression
 printExtension
     :   Identifier
     |   literal
+    |   arrayAccess
     ;
 
 scanStatement

@@ -30,35 +30,35 @@ public class MethodCallCom implements ICommand {
         this.functionName = functionName;
         this.exprCtx = exprCtx;
 
-        searchMethod();
+        this.searchMethod();
 
         ParseTreeWalker functionWalker = new ParseTreeWalker();
         functionWalker.walk(new FunctionCallVerifier(), this.exprCtx);
 
-        verifyParameters();
+        this.verifyParameters();
     }
 
     @Override
     public void execute() {
-        mapParameters();
-        javaMethod.execute();
+        this.mapParameters();
+        this.javaMethod.execute();
     }
 
     private void searchMethod() {
         ClassScope classScope = SymbolTableManager.getInstance().getClassScope(ParserHandler.getInstance().getCurrentClassName());
-        this.javaMethod = new JavaMethod(classScope.searchMethod(functionName));
+        this.javaMethod = new JavaMethod(classScope.searchMethod(this.functionName));
     }
 
     private void verifyParameters() {
-        if(exprCtx.argumentList() == null || exprCtx.argumentList().expression() == null) {
+        if(this.exprCtx.argumentList() == null || this.exprCtx.argumentList().expression() == null) {
             return;
         }
 
-        List<ExpressionContext> exprCtxList = exprCtx.argumentList().expression();
+        List<ExpressionContext> exprCtxList = this.exprCtx.argumentList().expression();
         //map values in parameters
         for(int i = 0; i < exprCtxList.size(); i++) {
             ExpressionContext parameterExprCtx = exprCtxList.get(i);
-            javaMethod.verifyParameterByValueAt(parameterExprCtx, i);
+            this.javaMethod.verifyParameterByValueAt(parameterExprCtx, i);
         }
     }
 
@@ -66,11 +66,11 @@ public class MethodCallCom implements ICommand {
      * Maps parameters when needed
      */
     private void mapParameters() {
-        if(exprCtx.argumentList() == null || exprCtx.argumentList().expression() == null) {
+        if(this.exprCtx.argumentList() == null || this.exprCtx.argumentList().expression() == null) {
             return;
         }
 
-        List<ExpressionContext> exprCtxList = exprCtx.argumentList().expression();
+        List<ExpressionContext> exprCtxList = this.exprCtx.argumentList().expression();
 
         //map values in parameters
         for(int i = 0; i < exprCtxList.size(); i++) {
@@ -78,19 +78,19 @@ public class MethodCallCom implements ICommand {
 
             if(this.javaMethod.getParameterAt(i).getPrimitiveType() == PrimitiveType.ARRAY) {
                 JavaValue javaValue = VariableSearcher.searchVariable(parameterExprCtx.getText());
-                javaMethod.mapArrayAt(javaValue, i, parameterExprCtx.getText());
+                this.javaMethod.mapArrayAt(javaValue, i, parameterExprCtx.getText());
             }
             else {
                 EvaluationCommand evaluationCommand = new EvaluationCommand(parameterExprCtx);
                 evaluationCommand.execute();
 
-                javaMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
+                this.javaMethod.mapParameterByValueAt(evaluationCommand.getResult().toEngineeringString(), i);
             }
         }
     }
 
     public JavaValue getReturnValue() {
-        return javaMethod.getReturnValue();
+        return this.javaMethod.getReturnValue();
     }
 
 }

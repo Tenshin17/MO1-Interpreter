@@ -16,57 +16,57 @@ public class JavaArray {
 	private boolean finalFlag = false;
 	
 	public JavaArray(PrimitiveType primitiveType, String identifier) {
-		arrayPrimitiveType = primitiveType;
-		arrayIdentifier = identifier;
+		this.arrayPrimitiveType = primitiveType;
+		this.arrayIdentifier = identifier;
 	}
 	
 	public void setPrimitiveType(PrimitiveType primitiveType) {
-		arrayPrimitiveType = primitiveType;
+		this.arrayPrimitiveType = primitiveType;
 	}
 	
 	public PrimitiveType getPrimitiveType() {
-		return arrayPrimitiveType;
+		return this.arrayPrimitiveType;
 	}
 	
 	public void markFinal() {
-		finalFlag = true;
+		this.finalFlag = true;
 	}
 	
 	public boolean isFinal() {
-		return finalFlag;
+		return this.finalFlag;
 	}
 	
 	public void initializeSize(int size) {
-		javaValueArray = new JavaValue[size];
+		this.javaValueArray = new JavaValue[size];
 		System.out.println("Java array initialized to size " + javaValueArray.length);
 	}
 	
 	public int getSize() {
-		return javaValueArray.length;
+		return this.javaValueArray.length;
 	}
 	
 	public void updateValueAt(JavaValue javaValue, int index) {
-		if(index >= javaValueArray.length) {
+		if(index >= this.javaValueArray.length) {
 			ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatError(
-					"JavaArray: Out of bounds exception for array " + arrayIdentifier + " Index: " + index));
+					"JavaArray: Out of bounds exception for array " + this.arrayIdentifier + " Index: " + index));
 			return;
 		}
-		javaValueArray[index] = javaValue;
+		this.javaValueArray[index] = javaValue;
 	}
 	
 	public JavaValue getValueAt(int index) {
-		if(index >= javaValueArray.length) {
+		if(index >= this.javaValueArray.length) {
 			ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatError(
-					"JavaArray: Out of bounds exception for array " + arrayIdentifier + " Index: " + index));
-			return javaValueArray[javaValueArray.length - 1];
+					"JavaArray: Out of bounds exception for array " + this.arrayIdentifier + " Index: " + index));
+			return this.javaValueArray[javaValueArray.length - 1];
 		}
 		else {
-			return javaValueArray[index];
+			return this.javaValueArray[index];
 		}
 	}
 	
 	/*
-	 * Utility function that returns an arary of specified primitive type.
+	 * Utility function that returns an array of specified primitive type.
 	 */
 	public static JavaArray createArray(String primitiveTypeString, String arrayIdentifier) {
 		//identify primitive type

@@ -2,6 +2,7 @@ package semantic.analyzers;
 
 import Execution.command.controlled.ForCom;
 import antlr.Java8Lexer;
+import antlr.Java8Parser;
 import antlr.Java8Parser.*;
 import antlr.Java8Parser.BlockContext;
 import antlr.Java8Parser.ExpressionContext;
@@ -31,27 +32,26 @@ public class StatementAnalyzer {
 	}
 	
 	public void analyze(StatementContext ctx) {
-
 		//print statement
 		if(ctx.printStatement() != null) handlePrintStatement(ctx);
 		else if(ctx.scanStatement() != null) handleScanStatement(ctx);
 		//an expression
-		/*
-		else if(ctx.statementWithoutTrailingSubstatement() != null) {
-			StatementExpressionAnalyzer expressionAnalyzer = new StatementExpressionAnalyzer();
-			expressionAnalyzer.analyze(ctx.statementWithoutTrailingSubstatement().expressionStatement().statementExpression());
-		}*/
 
 		else if(ctx.statementWithoutTrailingSubstatement() != null) {
-			BlockContext blockCtx = ctx.statementWithoutTrailingSubstatement().block();
-			System.out.println(blockCtx.getText()+"Im HERE");
-			BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
-			blockAnalyzer.analyze(blockCtx.blockStatements());
+			if(ctx.statementWithoutTrailingSubstatement().block() != null) {
+				BlockContext blockCtx = ctx.statementWithoutTrailingSubstatement().block();
+				//System.out.println(ctx.getText() + "Im HERE");
+				BlockAnalyzer blockAnalyzer = new BlockAnalyzer();
+				blockAnalyzer.analyze(blockCtx.blockStatements());
+			}
+			else if(ctx.statementWithoutTrailingSubstatement().expressionStatement() != null) {
+				StatementExpressionAnalyzer expressionAnalyzer = new StatementExpressionAnalyzer();
+				expressionAnalyzer.analyze(ctx.statementWithoutTrailingSubstatement().expressionStatement().statementExpression());
+			}
 		}
-
 		//an IF statement
 		else if(isIFStatement(ctx)) {
-
+			//System.out.println("New IF statement"+ctx.getText());
 			//check if there is an ELSE statement
 			if(isELSEStatement(ctx)) {
                 IfThenElseStatementContext statementCtx = ctx.ifThenElseStatement();
@@ -64,9 +64,6 @@ public class StatementAnalyzer {
 
                 StatementControlOverseer.getInstance().reportExitPositiveRule();
 
-				IfThenElseStatementContext statementCtx2 = ctx.ifThenElseStatement();
-
-				statementAnalyzer.analyze(statementCtx2.statement());
 			}
 			else {
                 IfThenStatementContext statementCtx = ctx.ifThenStatement();
@@ -226,12 +223,17 @@ public class StatementAnalyzer {
 	
 	public static boolean isIFStatement(StatementContext ctx) {
 		List<TerminalNode> tokenList = ctx.getTokens(Java8Lexer.IF);
-		
-		return (tokenList.size() != 0);
+		if(ctx.ifThenStatement() != null)
+			tokenList = ctx.ifThenStatement().getTokens(Java8Lexer.IF);
+		else if(ctx.ifThenElseStatement() != null)
+			tokenList = ctx.ifThenElseStatement().getTokens(Java8Lexer.IF);
+		return (tokenList.size() != 0 && tokenList != null);
 	}
 	
 	public static boolean isELSEStatement(StatementContext ctx) {
-		List<TerminalNode> tokenList = ctx.getTokens(Java8Lexer.ELSE);
+		if(ctx.ifThenElseStatement() == null)
+			return false;
+		List<TerminalNode> tokenList = ctx.ifThenElseStatement().getTokens(Java8Lexer.ELSE);
 		
 		return (tokenList.size() != 0);
 	}
@@ -242,16 +244,18 @@ public class StatementAnalyzer {
 		
 		return (whileTokenList.size() != 0 && doTokenList.size() == 0);
 	}
-	
+	/*
 	public static boolean isDOWHILEStatement(StatementContext ctx) {
 		List<TerminalNode> whileTokenList = ctx.getTokens(Java8Lexer.WHILE);
 		List<TerminalNode> doTokenList = ctx.getTokens(Java8Lexer.DO);
 		
 		return (whileTokenList.size() != 0 && doTokenList.size() != 0);
 	}
-	
+	*/
 	public static boolean isFORStatement(StatementContext ctx) {
 		List<TerminalNode> forTokenList = ctx.getTokens(Java8Lexer.FOR);
+		if(ctx.forStatement()!= null)
+			forTokenList = ctx.forStatement().basicForStatement().getTokens(Java8Lexer.FOR);
 		
 		return (forTokenList.size() != 0);
 	}

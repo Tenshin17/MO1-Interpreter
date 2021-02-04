@@ -20,7 +20,7 @@ public class AssignmentUtils {
 
 		// No type specified
 		if(javaValue == null){
-			System.out.println("JavaValue: No type specified :(");
+			System.out.println("JavaValue: Primitive type not specified ");
 		}
 		else {
 			if (javaValue.getPrimitiveType() == PrimitiveType.INT) {

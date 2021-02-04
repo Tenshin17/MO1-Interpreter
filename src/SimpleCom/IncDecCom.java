@@ -6,6 +6,7 @@ import antlr.Java8Parser.PostfixExpressionContext;
 import semantic.mapping.IValueMapper;
 import semantic.mapping.IdentifierMapper;
 import semantic.representation.JavaValue;
+import semantic.representation.JavaValueSearch;
 
 /**
  * An increment or decrement command
@@ -23,16 +24,17 @@ public class IncDecCom implements ICommand {
 
     @Override
     public void execute() {
-        // String identifier = this.exprCtx.primary().Identifier().getText();
-        // JavaValue javaValue = JavaValueSearcher.searchJavaValue(identifier);
+        String identifier = this.exprCtx.expressionName().Identifier().getText();
+        JavaValue javaValue = JavaValueSearch.searchJavaValue(identifier);
 
+        /*
         IValueMapper leftHandMapper = new IdentifierMapper(
-                exprCtx.getText());
-        leftHandMapper.analyze(exprCtx);
+                this.exprCtx.getText());
+        leftHandMapper.analyze(this.exprCtx);
 
         JavaValue javaValue = leftHandMapper.getJavaValue();
-
-        performOperation(javaValue);
+        */
+        this.performOperation(javaValue);
     }
 
     /*

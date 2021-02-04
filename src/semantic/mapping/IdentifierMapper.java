@@ -17,46 +17,46 @@ public class IdentifierMapper implements IValueMapper{
 	
 	public IdentifierMapper(String originalExp) {
 		if(FunctionTracker.getInstance().isInsideFunction()) {
-			valueMapper = new FunctionIdentifierMapper(originalExp, FunctionTracker.getInstance().getLatestFunction());
+			this.valueMapper = new FunctionIdentifierMapper(originalExp, FunctionTracker.getInstance().getLatestFunction());
 		}
 		else {
-			valueMapper = new ClassIdentifierMapper(originalExp);
+			this.valueMapper = new ClassIdentifierMapper(originalExp);
 		}
 	}
 
 	@Override
 	public void analyze(ExpressionContext exprCtx) {
-		valueMapper.analyze(exprCtx);
+		this.valueMapper.analyze(exprCtx);
 	}
 
 	@Override
 	public void analyze(NormalClassDeclarationContext exprCtx) {
-		valueMapper.analyze(exprCtx);
+		this.valueMapper.analyze(exprCtx);
 	}
 
 	@Override
 	public void analyze(MethodDeclaratorContext exprCtx) {
-		valueMapper.analyze(exprCtx);
+		this.valueMapper.analyze(exprCtx);
 	}
 
 	@Override
-	public void analyze(ConditionalExpressionContext exprCtx) { valueMapper.analyze(exprCtx); }
+	public void analyze(ConditionalExpressionContext exprCtx) { this.valueMapper.analyze(exprCtx); }
 
     @Override
-    public void analyze(PostfixExpressionContext exprCtx) { valueMapper.analyze(exprCtx); }
+    public void analyze(PostfixExpressionContext exprCtx) { this.valueMapper.analyze(exprCtx); }
 
 	@Override
 	public String getOriginalExp() {
-		return valueMapper.getOriginalExp();
+		return this.valueMapper.getOriginalExp();
 	}
 
 	@Override
 	public String getModifiedExp() {
-		return valueMapper.getModifiedExp();
+		return this.valueMapper.getModifiedExp();
 	}
 
 	@Override
 	public JavaValue getJavaValue() {
-		return valueMapper.getJavaValue();
+		return this.valueMapper.getJavaValue();
 	}
 }

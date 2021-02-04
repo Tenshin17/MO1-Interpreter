@@ -35,7 +35,7 @@ public class JavaMethod implements ICtrlCommand{
 		VOID_TYPE,
 	}
 	
-	private String functionName;
+	private String methodName;
 	private List<ICommand> commandSequences; //the list of commands execution by the function
 	
 	private LocalScope parentLocalScope; //refers to the parent local scope of this function.
@@ -44,16 +44,18 @@ public class JavaMethod implements ICtrlCommand{
 	private LinkedHashMap<String, JavaValue> parameterValues;	//the list of parameters accepted that follows the 'call-by-value' standard.
 	private JavaValue returnValue; //the return value of the function. null if it's a void type
 	private FunctionType returnType = FunctionType.VOID_TYPE; //the return type of the function
-	
+
+	private boolean hasValidReturns = true;
+
 	public JavaMethod() {
-		commandSequences = new ArrayList<>();
-		parameterValues = new LinkedHashMap<>();
-		parameterReferences = new LinkedHashMap<>();
+		this.commandSequences = new ArrayList<>();
+		this.parameterValues = new LinkedHashMap<>();
+		this.parameterReferences = new LinkedHashMap<>();
 	}
 
 	// for the recursion stuff
 	public JavaMethod(JavaMethod javaMethod) {
-	    this.functionName = javaMethod.functionName;
+	    this.methodName = javaMethod.methodName;
 	    this.commandSequences = new ArrayList<>(javaMethod.commandSequences);
 	    this.parentLocalScope = javaMethod.parentLocalScope;
 	    this.parameterReferences = new LinkedHashMap<>(javaMethod.parameterReferences);
@@ -61,139 +63,146 @@ public class JavaMethod implements ICtrlCommand{
 	    this.returnValue = javaMethod.returnValue;
 	    this.returnType = javaMethod.returnType;
     }
-	
+
 	public void setParentLocalScope(LocalScope localScope) {
-		parentLocalScope = localScope;
+		this.parentLocalScope = localScope;
 	}
-	
+
 	public LocalScope getParentLocalScope() {
-		return parentLocalScope;
+		return this.parentLocalScope;
 	}
-	
+
 	public void setReturnType(FunctionType functionType) {
-		returnType = functionType;
-		
+		this.returnType = functionType;
+
 		//create an empty java value as a return value
 		switch(returnType) {
-			case BOOLEAN_TYPE: returnValue = new JavaValue(true, PrimitiveType.BOOLEAN); break;
-			case BYTE_TYPE: returnValue = new JavaValue(0, PrimitiveType.BYTE); break;
-			case CHAR_TYPE: returnValue = new JavaValue(' ', PrimitiveType.CHAR); break;
-			case INT_TYPE: returnValue = new JavaValue(0, PrimitiveType.INT); break;
-			case DOUBLE_TYPE: returnValue = new JavaValue(0, PrimitiveType.DOUBLE); break;
-			case FLOAT_TYPE: returnValue = new JavaValue(0, PrimitiveType.FLOAT); break;
-			case LONG_TYPE: returnValue = new JavaValue(0, PrimitiveType.LONG); break;
-			case SHORT_TYPE: returnValue = new JavaValue(0, PrimitiveType.SHORT); break;
-			case STRING_TYPE: returnValue = new JavaValue("", PrimitiveType.STRING); break;
+			case BOOLEAN_TYPE: this.returnValue = new JavaValue(true, PrimitiveType.BOOLEAN); setValidReturns(false); break;
+			case BYTE_TYPE: this.returnValue = new JavaValue(0, PrimitiveType.BYTE); setValidReturns(false); break;
+			case CHAR_TYPE: this.returnValue = new JavaValue(' ', PrimitiveType.CHAR); setValidReturns(false); break;
+			case INT_TYPE: this.returnValue = new JavaValue(0, PrimitiveType.INT); setValidReturns(false); break;
+			case DOUBLE_TYPE: this.returnValue = new JavaValue(0, PrimitiveType.DOUBLE); setValidReturns(false); break;
+			case FLOAT_TYPE: this.returnValue = new JavaValue(0, PrimitiveType.FLOAT); setValidReturns(false); break;
+			case LONG_TYPE: this.returnValue = new JavaValue(0, PrimitiveType.LONG); setValidReturns(false); break;
+			case SHORT_TYPE: this.returnValue = new JavaValue(0, PrimitiveType.SHORT); setValidReturns(false); break;
+			case STRING_TYPE: this.returnValue = new JavaValue("", PrimitiveType.STRING); setValidReturns(false); break;
 			default: break;
 		}
 	}
-	
+
+	public boolean hasValidReturns(){
+		return this.hasValidReturns;
+	}
+
+	public void setValidReturns(boolean b) {
+		hasValidReturns = b;
+	}
+
 	public FunctionType getReturnType() {
-		return returnType;
+		return this.returnType;
 	}
-	
-	public void setFunctionName(String functionName) {
-		this.functionName = functionName;
+
+	public void setFunctionName(String methodName) {
+		this.methodName = methodName;
 	}
-	
+
 	public String getFunctionName() {
-		return functionName;
+		return methodName;
 	}
-	
+
 	/*
 	 * Maps parameters by values, which means that the value is copied to its parameter listing
 	 */
 	public void mapParameterByValue(String... values) {
 		for(int i = 0; i < values.length; i++) {
-			JavaValue javaValue = getParameterAt(i);
+			JavaValue javaValue = this.getParameterAt(i);
 			javaValue.setValue(values[i]);
 		}
 	}
-	
+
 	public void mapParameterByValueAt(String value, int index) {
-		if(index >= parameterValues.size()) {
+		if(index >= this.parameterValues.size()) {
 			return;
 		}
-		
-		JavaValue javaValue = getParameterAt(index);
+
+		JavaValue javaValue = this.getParameterAt(index);
 		javaValue.setValue(value);
 	}
-	
+
 	public void mapArrayAt(JavaValue javaValue, int index, String identifier) {
-		if(index >= parameterValues.size()) {
+		if(index >= this.parameterValues.size()) {
 			return;
 		}
-		
+
 		JavaArray javaArray = (JavaArray) javaValue.getValue();
-		
+
 		JavaArray newArray = new JavaArray(javaArray.getPrimitiveType(), identifier);
 		JavaValue newValue = new JavaValue(newArray, PrimitiveType.ARRAY);
-		
+
 		newArray.initializeSize(javaArray.getSize());
-		
+
 		for(int i = 0; i < newArray.getSize(); i++) {
 			newArray.updateValueAt(javaArray.getValueAt(i), i);
 		}
-		
-		parameterValues.put(getParameterKeyAt(index), newValue);
-		
+
+		this.parameterValues.put(getParameterKeyAt(index), newValue);
+
 	}
-	
+
 	public int getParameterValueSize() {
-		return parameterValues.size();
+		return this.parameterValues.size();
 	}
-	
+
 	public void verifyParameterByValueAt(ExpressionContext exprCtx, int index) {
-		if(index >= parameterValues.size()) {
+		if(index >= this.parameterValues.size()) {
 			return;
 		}
-		
-		JavaValue javaValue = getParameterAt(index);
+
+		JavaValue javaValue = this.getParameterAt(index);
 		TypeChecker typeChecker = new TypeChecker(javaValue, exprCtx);
 		typeChecker.verify();
 	}
-	
+
 	/*
 	 * Maps parameters by reference, in this case, accept a class scope.
 	 */
 	public void mapParameterByReference(ClassScope... classScopes) {
 		System.err.println("Mapping of parameter by reference not yet supported.");
 	}
-	
+
 	public void addParameter(String identifierString, JavaValue javaValue) {
-		parameterValues.put(identifierString, javaValue);
-		//txtWriter.writeMessage(StringUtils.formatDebug(functionName + " added an empty parameter " +
-				//identifierString+ " type " +javaValue.getPrimitiveType()));
+		this.parameterValues.put(identifierString, javaValue);
+
 	}
-	
+
 	public boolean hasParameter(String identifierString) {
-		return parameterValues.containsKey(identifierString);
+		return this.parameterValues.containsKey(identifierString);
 	}
 	public JavaValue getParameter(String identifierString) {
 		if(this.hasParameter(identifierString)) {
-			return parameterValues.get(identifierString);
+			return this.parameterValues.get(identifierString);
 		}
 		else {
 			System.err.println("JavaMethod: " + identifierString + " not found in parameter list");
 			return null;
 		}
 	}
-	
+
 	public JavaValue getParameterAt(int index) {
 		int i = 0;
 
-		for(JavaValue javaValue : parameterValues.values()) {
+		for(JavaValue javaValue : this.parameterValues.values()) {
 			if(i == index) {
 				return javaValue;
 			}
-			
+
 			i++;
 		}
 
 		System.err.println("JavaMethod: " + index + " has exceeded parameter list.");
 		return null;
 	}
-	
+
 	private String getParameterKeyAt(int index) {
 		int i = 0;
 
@@ -201,17 +210,16 @@ public class JavaMethod implements ICtrlCommand{
 			if(i == index) {
 				return key;
 			}
-			
+
 			i++;
 		}
 
 		System.err.println("JavaMethod: " + index + " has exceeded parameter list.");
 		return null;
 	}
-	
+
 	public JavaValue getReturnValue() {
 		if(this.returnType == FunctionType.VOID_TYPE) {
-			//txtWriter.writeMessage(StringUtils.formatDebug(functionName + " is a void function. Null java value is returned"));
 			return null;
 		}
 		else {
@@ -222,7 +230,6 @@ public class JavaMethod implements ICtrlCommand{
 	@Override
 	public void addCommand(ICommand command) {
 		this.commandSequences.add(command);
-		//Console.log("Execution.command added to " +this.functionName);
 	}
 	
 	@Override

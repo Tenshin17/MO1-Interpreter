@@ -81,7 +81,7 @@ public class LocalScopeCreator {
 	public static JavaValue searchVariableInLocalIterative(String identifier, LocalScope localScope) {
 
 		if(localScope == null) {
-			System.out.println(TAG + ": " + identifier + " not found in any local scope!");
+			System.out.println(TAG + ": " + identifier + " not found in any local scope! I'm null");
 			return null;
 		}
 

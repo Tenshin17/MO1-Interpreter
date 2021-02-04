@@ -35,7 +35,7 @@ public class FunctionIdentifierMapper implements ParseTreeListener, IValueMapper
 		this.originalExp = originalExp;
 		this.modifiedExp = originalExp;
 		this.assignedFunction = assignedFunction;
-		functionLocalScope = assignedFunction.getParentLocalScope();
+		this.functionLocalScope = assignedFunction.getParentLocalScope();
 	}
 	
 	@Override
@@ -95,20 +95,20 @@ public class FunctionIdentifierMapper implements ParseTreeListener, IValueMapper
 	}
 	
 	private void searchVariable(String identifierString) {
-		if(assignedFunction.hasParameter(identifierString)) {
-			modifiedExp = modifiedExp.replace(identifierString, assignedFunction.getParameter(identifierString).getValue().toString());
+		if(this.assignedFunction.hasParameter(identifierString)) {
+			this.modifiedExp = this.modifiedExp.replace(identifierString, this.assignedFunction.getParameter(identifierString).getValue().toString());
 		}
 		else {
-			javaValue = LocalScopeCreator.searchVariableInLocalIterative(identifierString, functionLocalScope);
+			this.javaValue = LocalScopeCreator.searchVariableInLocalIterative(identifierString, this.functionLocalScope);
 			
-			if(javaValue != null) {
-				modifiedExp = modifiedExp.replace(identifierString, javaValue.getValue().toString());
+			if(this.javaValue != null) {
+				this.modifiedExp = this.modifiedExp.replace(identifierString, this.javaValue.getValue().toString());
 			}
 			else {
 				ClassScope classScope = SymbolTableManager.getInstance().getClassScope(ParserHandler.getInstance().getCurrentClassName());
-				javaValue = classScope.searchVariableIncludingLocal(identifierString);
+				this.javaValue = classScope.searchVariableIncludingLocal(identifierString);
 
-				modifiedExp = modifiedExp.replace(identifierString, javaValue.getValue().toString());
+				this.modifiedExp = this.modifiedExp.replace(identifierString, this.javaValue.getValue().toString());
 			}
 		}
 	}

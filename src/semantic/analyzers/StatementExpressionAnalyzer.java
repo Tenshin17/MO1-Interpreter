@@ -31,7 +31,6 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 
 	private ExpressionContext readRightHandExprCtx; //used to avoid mistakenly reading right hand expressions as direct function calls as well.
 	
-	//TODO: find a way to not rely on tree depth for function calls.
 	public final static int FUNCTION_CALL_NO_PARAMS_DEPTH = 13;
 	public final static int FUNCTION_CALL_WITH_PARAMS_DEPTH = 14;
 	
@@ -63,12 +62,12 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 			
 			if(exprCtx.assignment() != null) {
 				ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Assignment expr detected: " +exprCtx.getText()));
-				
+				//System.out.println("assign expr:"+exprCtx.getText());
 				AssignmentContext exprListCtx = exprCtx.assignment();
 				AssignCom assignmentCommand = new AssignCom(exprListCtx.leftHandSide(), exprListCtx.expression());
 				
-				readRightHandExprCtx = exprListCtx.expression();
-				handleStatementExecution(assignmentCommand);
+				this.readRightHandExprCtx = exprListCtx.expression();
+				this.handleStatementExecution(assignmentCommand);
 				
 			}
 			else if(exprCtx.postIncrementExpression() != null) {
@@ -77,7 +76,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 				PostIncrementExpressionContext exprListCtx = exprCtx.postIncrementExpression();
 				if(!ConstChecker.isConstFormat(exprListCtx.postfixExpression().expressionName())) {
 					IncDecCom incDecCommand = new IncDecCom(exprListCtx.postfixExpression(), Java8Lexer.INC);
-					handleStatementExecution(incDecCommand);
+					this.handleStatementExecution(incDecCommand);
 				} else {
 					CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.CONST_INTDEC,
 							exprListCtx.postfixExpression().getText(), exprListCtx.postfixExpression().getStart().getLine());
@@ -90,7 +89,7 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 				PostDecrementExpressionContext exprListCtx = exprCtx.postDecrementExpression();
 				if(!ConstChecker.isConstFormat(exprListCtx.postfixExpression().expressionName())) {
 					IncDecCom incDecCommand = new IncDecCom(exprListCtx.postfixExpression(), Java8Lexer.DEC);
-					handleStatementExecution(incDecCommand);
+					this.handleStatementExecution(incDecCommand);
 				} else {
 					CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.CONST_INTDEC,
 							exprListCtx.postfixExpression().getText(), exprListCtx.postfixExpression().getStart().getLine());
@@ -98,11 +97,11 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 			}
 			
 			else if(exprCtx.methodInvocation() != null && exprCtx.methodInvocation().argumentList() != null) {
-				handleFunctionCallWithParams(exprCtx.methodInvocation());
+				this.handleFunctionCallWithParams(exprCtx.methodInvocation());
 			}
 			
 			else if(exprCtx.methodInvocation() != null && exprCtx.methodInvocation().argumentList() == null) {
-				handleFunctionCallWithNoParams(exprCtx.methodInvocation());
+				this.handleFunctionCallWithNoParams(exprCtx.methodInvocation());
 			}
 		}
 	}
@@ -164,13 +163,13 @@ public class StatementExpressionAnalyzer implements ParseTreeListener {
 	}
 	
 	public static boolean isIncrementExpression(StatementExpressionContext exprCtx) {
-		List<TerminalNode> incrementList = exprCtx.getTokens(Java8Lexer.INC);
+		List<TerminalNode> incrementList = exprCtx.postIncrementExpression().getTokens(Java8Lexer.INC);
 		
 		return (incrementList.size() > 0);
 	}
 	
 	public static boolean isDecrementExpression(StatementExpressionContext exprCtx) {
-		List<TerminalNode> decrementList = exprCtx.getTokens(Java8Lexer.DEC);
+		List<TerminalNode> decrementList = exprCtx.postDecrementExpression().getTokens(Java8Lexer.DEC);
 		
 		return (decrementList.size() > 0);
 	}

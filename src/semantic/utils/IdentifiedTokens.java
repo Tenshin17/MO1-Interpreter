@@ -12,19 +12,19 @@ public class IdentifiedTokens {
 	private HashMap<String, String> tokenMapping;
 	
 	public IdentifiedTokens() {
-		tokenMapping = new HashMap<>();
+		this.tokenMapping = new HashMap<>();
 	}
 	
 	public void addToken(String key, String text) {
-		tokenMapping.put(key, text);
+		this.tokenMapping.put(key, text);
 	}
 	
 	public void removeToken(String key) {
-		if(tokenMapping.containsKey(key)) tokenMapping.remove(key);
+		if(this.tokenMapping.containsKey(key)) this.tokenMapping.remove(key);
 	}
 	
 	public String getToken(String key) {
-		if(tokenMapping.containsKey(key)) return tokenMapping.get(key);
+		if(this.tokenMapping.containsKey(key)) return this.tokenMapping.get(key);
 		else {
 			System.err.println("IdentifiedTokens: " + key + " not found in list of tokens.");
 			return null;
@@ -32,7 +32,7 @@ public class IdentifiedTokens {
 	}
 	
 	public int getTokenListLength() {
-		return tokenMapping.size();
+		return this.tokenMapping.size();
 	}
 	
 	
@@ -40,11 +40,11 @@ public class IdentifiedTokens {
 	 * Returns true if all of the specified keys has been found
 	 */
 	public boolean containsTokens(String...keys) {
-		for (String key : keys) if (!tokenMapping.containsKey(key)) return false;
+		for (String key : keys) if (!this.tokenMapping.containsKey(key)) return false;
 		return true;
 	}
 	
 	public void clearTokens() {
-		tokenMapping.clear();
+		this.tokenMapping.clear();
 	}
 }

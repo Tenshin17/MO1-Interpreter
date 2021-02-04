@@ -3,12 +3,19 @@ package SimpleCom;
 import antlr.Java8Parser.*;
 import Execution.ExecutionManager;
 import Execution.command.ICommand;
+import error.CustomErrorStrategy;
+import semantic.representation.JavaArray;
+import semantic.representation.JavaValue;
+import semantic.representation.JavaValueSearch;
+import semantic.searching.VariableSearcher;
 import semantic.utils.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.List;
 
 /**
  * Populates and handles the print command Execution
@@ -19,10 +26,12 @@ public class PrintCom implements ICommand, ParseTreeListener {
     private PrintStatementContext expressionCtx;
 
     private String statementToPrint = "";
+    private boolean isLN = false;
     private boolean complexExpr = false;
     private boolean arrayAccess = false;
 
     public PrintCom(PrintStatementContext expressionCtx) {
+        isLN = expressionCtx.PRINTLN() != null;
         this.expressionCtx = expressionCtx;
 
         //UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.expressionCtx);
@@ -33,8 +42,12 @@ public class PrintCom implements ICommand, ParseTreeListener {
     public void execute() {
         ParseTreeWalker treeWalker = new ParseTreeWalker();
         treeWalker.walk(this, expressionCtx);
+
+        if(isLN)
+            statementToPrint += "\n";
+
         ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatProgram(statementToPrint));
-        System.out.println(statementToPrint);
+        //System.out.println(statementToPrint);
         statementToPrint = ""; //reset statement to print afterwards
     }
 
@@ -52,60 +65,62 @@ public class PrintCom implements ICommand, ParseTreeListener {
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
         if(ctx instanceof LiteralContext) {
-            LiteralContext literalCtx = (LiteralContext) ctx;
 
-            if(literalCtx.StringLiteral() != null) {
-                String quotedString = literalCtx.StringLiteral().getText();
-                statementToPrint += StringUtils.removeQuotes(quotedString);
-            }
-            else if(literalCtx.IntegerLiteral() != null) {
-                int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
-                this.statementToPrint += value;
-            }
-
-            else if(literalCtx.FloatingPointLiteral() != null) {
-                float value = Float.parseFloat(literalCtx.FloatingPointLiteral().getText());
-                this.statementToPrint += value;
-            }
-
-            else if(literalCtx.BooleanLiteral() != null) {
-                this.statementToPrint += literalCtx.BooleanLiteral().getText();
-            }
-
-            else if(literalCtx.CharacterLiteral() != null) {
-                this.statementToPrint += literalCtx.CharacterLiteral().getText();
-            }
         }
 
-        else if(ctx instanceof PrintExtensionContext) {
-            PrintExtensionContext primaryCtx = (PrintExtensionContext) ctx;
+        else if(ctx instanceof PrintExpressionContext) {
+            List<PrintExtensionContext> primaryCtx = ((PrintExpressionContext) ctx).printExtension();
 
-            if(primaryCtx != null) {
-                PrintExtensionContext exprCtx = primaryCtx;
+            for(PrintExtensionContext exprCtx : primaryCtx) {
                 complexExpr = true;
-                ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Complex expression detected: " + exprCtx.getText()));
+                //ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Complex expression detected: " + exprCtx.getText()));
 
+                if(exprCtx.literal() != null) {
+                    LiteralContext literalCtx = exprCtx.literal();
 
-                statementToPrint += primaryCtx.Identifier().getText();
-            }
-            /*
-            else if(primaryCtx.Identifier() != null && !complexExpr) {
-                String identifier = primaryCtx.getText();
-
-                JavaValue value = JavaValueSearch.searchJavaValue(identifier);
-                if(value != null) {
-                    if (value.getPrimitiveType() == PrimitiveType.ARRAY) {
-                        arrayAccess = true;
-                        evaluateArrayPrint(value, primaryCtx);
-                    } else if (!arrayAccess) {
-                        statementToPrint += value.getValue();
+                    if (literalCtx.StringLiteral() != null) {
+                        String quotedString = literalCtx.StringLiteral().getText();
+                        statementToPrint += StringUtils.removeQuotes(quotedString);
+                    } else if (literalCtx.IntegerLiteral() != null) {
+                        int value = Integer.parseInt(literalCtx.IntegerLiteral().getText());
+                        this.statementToPrint += value;
+                    } else if (literalCtx.FloatingPointLiteral() != null) {
+                        float value = Float.parseFloat(literalCtx.FloatingPointLiteral().getText());
+                        this.statementToPrint += value;
+                    } else if (literalCtx.BooleanLiteral() != null) {
+                        this.statementToPrint += literalCtx.BooleanLiteral().getText();
+                    } else if (literalCtx.CharacterLiteral() != null) {
+                        this.statementToPrint += literalCtx.CharacterLiteral().getText();
                     }
-                } else{
-                    CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.UNDECLARED_VARIABLE,
-                            primaryCtx.getText(), primaryCtx.getStart().getLine());
                 }
+                else if(exprCtx.Identifier() != null){
+                    JavaValue javaValue = VariableSearcher.searchVariable(exprCtx.Identifier().getText());
+                    if(javaValue != null) {
+                        if(javaValue.getPrimitiveType() == JavaValue.PrimitiveType.ARRAY) {
+                            JavaArray javaArray = (JavaArray) javaValue.getValue();
+
+                        }
+                        else {
+                            statementToPrint += javaValue.getValue().toString();
+                        }
+                    }
+                    else {
+                        CustomErrorStrategy.reportSemanticError(1,exprCtx.getText(),exprCtx.getStart().getLine());
+                    }
+                }
+                else if(exprCtx.arrayAccess() != null) {
+                    JavaValue javaValue = VariableSearcher.searchVariable(exprCtx.arrayAccess().expressionName().Identifier().getText());
+                    if(javaValue != null) {
+                        JavaArray javaArray = (JavaArray) javaValue.getValue();
+                        JavaValue arrElement = javaArray.getValueAt(Integer.parseInt(exprCtx.arrayAccess().expression(0).getText()));
+                        statementToPrint += arrElement.getValue().toString();
+                    }
+                    else {
+                        CustomErrorStrategy.reportSemanticError(1,exprCtx.arrayAccess().expressionName().Identifier().getText(),exprCtx.getStart().getLine());
+                    }
+                }
+
             }
-            */
         }
     }
 
@@ -115,7 +130,7 @@ public class PrintCom implements ICommand, ParseTreeListener {
     }
 
     public String getStatementToPrint() {
-        return statementToPrint;
+        return this.statementToPrint;
     }
     /*
     private void evaluateArrayPrint(JavaValue javaValue, PrintExtensionContext primaryCtx) {

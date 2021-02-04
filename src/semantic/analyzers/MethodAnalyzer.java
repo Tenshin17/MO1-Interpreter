@@ -69,6 +69,17 @@ public class MethodAnalyzer implements ParseTreeListener {
 	@Override
 	public void exitEveryRule(ParserRuleContext ctx) {
 		if(ctx instanceof MethodDeclarationContext) {
+			MethodDeclarationContext mdCtx = (MethodDeclarationContext) ctx;
+
+			if (!this.declaredJavaMethod.hasValidReturns()) {
+
+				int lineNumber = 0;
+
+				if (mdCtx.methodHeader().methodDeclarator().Identifier() != null)
+					lineNumber = mdCtx.methodHeader().methodDeclarator().Identifier().getSymbol().getLine();
+
+				ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatError("No return statement in function "+this.declaredJavaMethod.getFunctionName()+" at line "+ lineNumber));
+			}
 			ExecutionManager.getExecutionManager().closeFunctionExecution();
 		}
 	}
@@ -85,7 +96,7 @@ public class MethodAnalyzer implements ParseTreeListener {
 			}
 			//return type is a string or a class type
 			else {
-				analyzeClassOrInterfaceType(typeCtx.unannReferenceType().unannClassOrInterfaceType());
+				this.analyzeClassOrInterfaceType(typeCtx.unannReferenceType().unannClassOrInterfaceType());
 			}
 		}
 		
@@ -122,7 +133,7 @@ public class MethodAnalyzer implements ParseTreeListener {
 	
 	private void analyzeParameters(FormalParameterListContext formalParamsCtx) {
 		if(formalParamsCtx != null) {
-			ParameterAnalyzer parameterAnalyzer = new ParameterAnalyzer(declaredJavaMethod);
+			ParameterAnalyzer parameterAnalyzer = new ParameterAnalyzer(this.declaredJavaMethod);
 			parameterAnalyzer.analyze(formalParamsCtx);
 		}
 	}
@@ -143,8 +154,5 @@ public class MethodAnalyzer implements ParseTreeListener {
 			
 			this.identifiedTokens.clearTokens(); //clear tokens for reuse
 		}
-		this.declaredClassScope.addPublicJavaMethod(declaredJavaMethod.getFunctionName(), declaredJavaMethod);
-		this.identifiedTokens.clearTokens(); //clear tokens for reuse
 	}
-
 }

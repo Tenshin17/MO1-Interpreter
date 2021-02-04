@@ -57,16 +57,16 @@ public class FieldAnalyzer implements ParseTreeListener {
 			MultipleVarDecChecker multipleDeclaredChecker = new MultipleVarDecChecker(varCtx.variableDeclaratorId());
 			multipleDeclaredChecker.verify();
 			
-			identifiedTokens.addToken(ClassAnalyzer.IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
-			createJavaValue();
+			this.identifiedTokens.addToken(ClassAnalyzer.IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
+			this.createJavaValue();
 			
 			if(varCtx.variableInitializer() != null) {
 				
 				//we do not evaluate strings.
-				if(identifiedTokens.containsTokens(ClassAnalyzer.PRIMITIVE_TYPE_KEY)) {
-					String primitiveTypeString = identifiedTokens.getToken(ClassAnalyzer.PRIMITIVE_TYPE_KEY);
+				if(this.identifiedTokens.containsTokens(ClassAnalyzer.PRIMITIVE_TYPE_KEY)) {
+					String primitiveTypeString = this.identifiedTokens.getToken(ClassAnalyzer.PRIMITIVE_TYPE_KEY);
 					if(primitiveTypeString.contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
-						identifiedTokens.addToken(ClassAnalyzer.IDENTIFIER_VALUE_KEY, varCtx.variableInitializer().getText());
+						this.identifiedTokens.addToken(ClassAnalyzer.IDENTIFIER_VALUE_KEY, varCtx.variableInitializer().getText());
 						return;
 					}
 				}
@@ -74,7 +74,7 @@ public class FieldAnalyzer implements ParseTreeListener {
 				MappingCommand mappingCommand = new MappingCommand(varCtx.variableDeclaratorId().getText(), varCtx.variableInitializer().expression());
 				ExecutionManager.getExecutionManager().addCommand(mappingCommand);
 				
-				JavaValue declaredJavaValue = declaredClassScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
+				JavaValue declaredJavaValue = this.declaredClassScope.searchVariableIncludingLocal(varCtx.variableDeclaratorId().getText());
 				
 				//type check the javaValue
 				TypeChecker typeChecker = new TypeChecker(declaredJavaValue, varCtx.variableInitializer().expression());
@@ -95,33 +95,33 @@ public class FieldAnalyzer implements ParseTreeListener {
 	 */
 	private void createJavaValue() {
 		
-		if(identifiedTokens.containsTokens(ClassAnalyzer.ACCESS_CONTROL_KEY, ClassAnalyzer.PRIMITIVE_TYPE_KEY, ClassAnalyzer.IDENTIFIER_KEY)) {
+		if(this.identifiedTokens.containsTokens(ClassAnalyzer.ACCESS_CONTROL_KEY, ClassAnalyzer.PRIMITIVE_TYPE_KEY, ClassAnalyzer.IDENTIFIER_KEY)) {
 			
-			String classModifierString = identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
-			String primitiveTypeString = identifiedTokens.getToken(ClassAnalyzer.PRIMITIVE_TYPE_KEY);
-			String identifierString = identifiedTokens.getToken(ClassAnalyzer.IDENTIFIER_KEY);
+			String classModifierString = this.identifiedTokens.getToken(ClassAnalyzer.ACCESS_CONTROL_KEY);
+			String primitiveTypeString = this.identifiedTokens.getToken(ClassAnalyzer.PRIMITIVE_TYPE_KEY);
+			String identifierString = this.identifiedTokens.getToken(ClassAnalyzer.IDENTIFIER_KEY);
 			String identifierValueString;
 
 			ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Class modifier: " +classModifierString));
 			
 			if(identifiedTokens.containsTokens(ClassAnalyzer.IDENTIFIER_VALUE_KEY)) {
 				identifierValueString = identifiedTokens.getToken(ClassAnalyzer.IDENTIFIER_VALUE_KEY);
-				declaredClassScope.addInitializedVariableFromKeywords(classModifierString, primitiveTypeString, identifierString, identifierValueString);
+				this.declaredClassScope.addInitializedVariableFromKeywords(classModifierString, primitiveTypeString, identifierString, identifierValueString);
 			}
 			else {
-				declaredClassScope.addEmptyVariableFromKeywords(classModifierString, primitiveTypeString, identifierString);
+				this.declaredClassScope.addEmptyVariableFromKeywords(classModifierString, primitiveTypeString, identifierString);
 			}
 			
-			JavaValue declaredValue = declaredClassScope.searchVariableIncludingLocal(identifierString);
+			JavaValue declaredValue = this.declaredClassScope.searchVariableIncludingLocal(identifierString);
 
 			//verify if the declared variable is a constant
-			if(identifiedTokens.containsTokens(ClassAnalyzer.CONST_CONTROL_KEY)) {
+			if(this.identifiedTokens.containsTokens(ClassAnalyzer.CONST_CONTROL_KEY)) {
 				declaredValue.markFinal();
 			}
 			
 			//remove the following tokens
-			identifiedTokens.removeToken(ClassAnalyzer.IDENTIFIER_KEY);
-			identifiedTokens.removeToken(ClassAnalyzer.IDENTIFIER_VALUE_KEY);
+			this.identifiedTokens.removeToken(ClassAnalyzer.IDENTIFIER_KEY);
+			this.identifiedTokens.removeToken(ClassAnalyzer.IDENTIFIER_VALUE_KEY);
 		}
 	}
 }

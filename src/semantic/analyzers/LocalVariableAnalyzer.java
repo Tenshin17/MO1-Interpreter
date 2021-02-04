@@ -1,5 +1,7 @@
 package semantic.analyzers;
 
+import Execution.command.ICondCommand;
+import Execution.command.ICtrlCommand;
 import antlr.Java8Lexer;
 import antlr.Java8Parser.*;
 import error.checkers.MultipleVarDecChecker;
@@ -7,6 +9,7 @@ import error.checkers.TypeChecker;
 import Execution.ExecutionManager;
 import Execution.command.evaluation.MappingCommand;
 import semantic.representation.JavaValue;
+import semantic.statements.StatementControlOverseer;
 import semantic.symboltable.scope.LocalScope;
 import semantic.symboltable.scope.LocalScopeCreator;
 import semantic.utils.IdentifiedTokens;
@@ -74,19 +77,19 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 		if(ctx instanceof UnannTypeContext) {
 			UnannTypeContext typeCtx = (UnannTypeContext) ctx;
 			//clear tokens for reuse
-			identifiedTokens.clearTokens();
+			//this.identifiedTokens.clearTokens();
 
 			if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
 				UnannPrimitiveTypeContext unannPrimitiveTypeCtx = typeCtx.unannPrimitiveType();
-				identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, unannPrimitiveTypeCtx.getText());
+				this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, unannPrimitiveTypeCtx.getText());
 			}
 
 			//check if its array declaration
 			else if(ClassAnalyzer.isPrimitiveArrayDeclaration(typeCtx)) {
 				ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Primitive array declaration: " +typeCtx.getText()));
-				ArrayAnalyzer arrayAnalyzer = new ArrayAnalyzer(identifiedTokens, LocalScopeCreator.getInstance().getActiveLocalScope());
+				ArrayAnalyzer arrayAnalyzer = new ArrayAnalyzer(this.identifiedTokens, LocalScopeCreator.getInstance().getActiveLocalScope());
 				arrayAnalyzer.analyze(typeCtx.getParent());
-				hasPassedArrayDeclaration = true;
+				this.hasPassedArrayDeclaration = true;
 			}
 
 			//this is for class type ctx
@@ -94,7 +97,7 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 				//a string identified
 				if(typeCtx.unannReferenceType().getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
 					UnannClassOrInterfaceTypeContext classInterfaceCtx = typeCtx.unannReferenceType().unannClassOrInterfaceType();
-					identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, classInterfaceCtx.getText());
+					this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, classInterfaceCtx.getText());
 				}
 			}
 		}
@@ -102,33 +105,33 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 			VariableModifierContext varModCtx = (VariableModifierContext) ctx;
 			if(varModCtx.getTokens(Java8Lexer.FINAL).size() > 0){
 				ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Detected const / final: " + varModCtx.getText()));
-				currentlyConst = true;
+				this.currentlyConst = true;
 			}
 		}
 		else if(ctx instanceof VariableDeclaratorContext) {
 
 			VariableDeclaratorContext varCtx = (VariableDeclaratorContext) ctx;
 
-			if(hasPassedArrayDeclaration) {
+			if(this.hasPassedArrayDeclaration) {
 				return;
 			}
 
 			//check for duplicate declarations
-			if(!executeMappingImmediate) {
+			if(!this.executeMappingImmediate) {
 				MultipleVarDecChecker multipleDeclaredChecker = new MultipleVarDecChecker(varCtx.variableDeclaratorId());
 				multipleDeclaredChecker.verify();
 			}
 
-			identifiedTokens.addToken(IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
-			createJavaValue();
+			this.identifiedTokens.addToken(IDENTIFIER_KEY, varCtx.variableDeclaratorId().getText());
+			this.createJavaValue();
 
 			if(varCtx.variableInitializer() != null) {
 
 				//we do not evaluate strings.
-				if(identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY)) {
-					String unannPrimitiveTypeString = identifiedTokens.getToken(PRIMITIVE_TYPE_KEY);
+				if(this.identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY)) {
+					String unannPrimitiveTypeString = this.identifiedTokens.getToken(PRIMITIVE_TYPE_KEY);
 					if(unannPrimitiveTypeString.contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
-						identifiedTokens.addToken(IDENTIFIER_VALUE_KEY, varCtx.variableInitializer().getText());
+						this.identifiedTokens.addToken(IDENTIFIER_VALUE_KEY, varCtx.variableInitializer().getText());
 					}
 				}
 
@@ -158,12 +161,32 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 		}
 		else {
 			MappingCommand mappingCommand = new MappingCommand(varCtx.variableDeclaratorId().getText(), varCtx.variableInitializer().expression());
-			ExecutionManager.getExecutionManager().addCommand(mappingCommand);
+
+			StatementControlOverseer statementControl = StatementControlOverseer.getInstance();
+			//add to conditional controlled command
+			if(statementControl.isInConditionalCommand()) {
+				ICondCommand conditionalCommand = (ICondCommand) statementControl.getActiveControlledCommand();
+
+				if(statementControl.isInPositiveRule()) {
+					conditionalCommand.addPositiveCommand(mappingCommand);
+				}
+				else {
+					conditionalCommand.addNegativeCommand(mappingCommand);
+				}
+			}
+
+			else if(statementControl.isInControlledCommand()) {
+				ICtrlCommand controlledCommand = (ICtrlCommand) statementControl.getActiveControlledCommand();
+				controlledCommand.addCommand(mappingCommand);
+			}
+			else {
+				ExecutionManager.getExecutionManager().addCommand(mappingCommand);
+			}
 		}
 	}
 
 	public void markImmediateExecution() {
-		executeMappingImmediate = true;
+		this.executeMappingImmediate = true;
 	}
 
 	/*
@@ -171,16 +194,16 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 	 */
 	private void createJavaValue() {
 
-		if(identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY, IDENTIFIER_KEY)) {
+		if(this.identifiedTokens.containsTokens(PRIMITIVE_TYPE_KEY, IDENTIFIER_KEY)) {
 
-			String unannPrimitiveTypeString = identifiedTokens.getToken(PRIMITIVE_TYPE_KEY);
-			String identifierString = identifiedTokens.getToken(IDENTIFIER_KEY);
+			String unannPrimitiveTypeString = this.identifiedTokens.getToken(PRIMITIVE_TYPE_KEY);
+			String identifierString = this.identifiedTokens.getToken(IDENTIFIER_KEY);
 			String identifierValueString;
 
 			LocalScope localScope = LocalScopeCreator.getInstance().getActiveLocalScope();
 
-			if(identifiedTokens.containsTokens(IDENTIFIER_VALUE_KEY)) {
-				identifierValueString = identifiedTokens.getToken(IDENTIFIER_VALUE_KEY);
+			if(this.identifiedTokens.containsTokens(IDENTIFIER_VALUE_KEY)) {
+				identifierValueString = this.identifiedTokens.getToken(IDENTIFIER_VALUE_KEY);
 				localScope.addInitializedVariableFromKeywords(unannPrimitiveTypeString, identifierString, identifierValueString);
 			}
 			else {
@@ -188,8 +211,8 @@ public class LocalVariableAnalyzer implements ParseTreeListener {
 			}
 
 			//remove the following tokens
-			identifiedTokens.removeToken(IDENTIFIER_KEY);
-			identifiedTokens.removeToken(IDENTIFIER_VALUE_KEY);
+			this.identifiedTokens.removeToken(IDENTIFIER_KEY);
+			this.identifiedTokens.removeToken(IDENTIFIER_VALUE_KEY);
 
 		}
 	}

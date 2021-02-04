@@ -3,6 +3,7 @@ package semantic.analyzers;
 import antlr.Java8Lexer;
 import antlr.Java8Parser.*;
 import Execution.ExecutionManager;
+import error.checkers.ClassNameChecker;
 import semantic.symboltable.SymbolTableManager;
 import semantic.symboltable.scope.ClassScope;
 import semantic.utils.IdentifiedTokens;
@@ -20,7 +21,7 @@ import java.util.List;
  * A bridge for analyzing creation of a class
  *
  */
-public class ClassAnalyzer implements ParseTreeListener {
+public class ClassAnalyzer {
 	
 	private ClassScope declaredClassScope;
 	private IdentifiedTokens identifiedTokens;
@@ -37,47 +38,24 @@ public class ClassAnalyzer implements ParseTreeListener {
 	}
 	
 	public void analyze(ClassDeclarationContext ctx) {
-		// String className = ctx.Identifier().getText();
-		System.out.println("Class accessed: Main");
+		String className = ctx.normalClassDeclaration().Identifier().getText();
+		System.out.println("Class accessed: "+ctx.normalClassDeclaration().Identifier().getText());
+		ClassNameChecker classNameChecker = new ClassNameChecker(className);
+		classNameChecker.verify();
 
-		declaredClassScope = new ClassScope("Main");
-		identifiedTokens = new IdentifiedTokens();
-		
-		ParseTreeWalker treeWalker = new ParseTreeWalker();
-		treeWalker.walk(this, ctx);
-	}
+		this.declaredClassScope = new ClassScope("Main");
+		this.identifiedTokens = new IdentifiedTokens();
 
-	@Override
-	public void visitTerminal(TerminalNode node) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitErrorNode(ErrorNode node) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void enterEveryRule(ParserRuleContext ctx) {
-		if(ctx instanceof ClassDeclarationContext) {
-			SymbolTableManager.getInstance().addClassScope(declaredClassScope.getClassName(), declaredClassScope);
-		}
-		
+		SymbolTableManager.getInstance().addClassScope(this.declaredClassScope.getClassName(), this.declaredClassScope);
 		this.analyzeClassMembers(ctx);
 	}
 
-	@Override
-	public void exitEveryRule(ParserRuleContext ctx) {
-		
-	}
-	
+
 	private void analyzeClassMembers(ParserRuleContext ctx) {
 		if(ctx instanceof ClassModifierContext) {
 			ClassModifierContext classModifierCtx = (ClassModifierContext) ctx;
 			
-			analyzeModifier(classModifierCtx);
+			this.analyzeModifier(classModifierCtx);
 		}
 		
 		else if(ctx instanceof FieldDeclarationContext) {
@@ -89,20 +67,20 @@ public class ClassAnalyzer implements ParseTreeListener {
 				//check if its a primitive type
 				if(ClassAnalyzer.isPrimitiveDeclaration(typeCtx)) {
 					UnannPrimitiveTypeContext primitiveTypeCtx = typeCtx.unannPrimitiveType();
-					identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, primitiveTypeCtx.getText());
+					this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, primitiveTypeCtx.getText());
 					
 					//create a field analyzer to walk through declarations
-					FieldAnalyzer fieldAnalyzer = new FieldAnalyzer(identifiedTokens, declaredClassScope);
+					FieldAnalyzer fieldAnalyzer = new FieldAnalyzer(this.identifiedTokens, this.declaredClassScope);
 					fieldAnalyzer.analyze(fieldCtx.variableDeclaratorList());
 					
 					//clear tokens for reause
-					identifiedTokens.clearTokens();
+					this.identifiedTokens.clearTokens();
 				}
 				
 				//check if its array declaration
 				else if(ClassAnalyzer.isPrimitiveArrayDeclaration(typeCtx)) {
 					ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Primitive array declaration: " +fieldCtx.getText()));
-					ArrayAnalyzer arrayAnalyzer = new ArrayAnalyzer(identifiedTokens, declaredClassScope);
+					ArrayAnalyzer arrayAnalyzer = new ArrayAnalyzer(this.identifiedTokens, this.declaredClassScope);
 					arrayAnalyzer.analyze(fieldCtx);
 				}
 				
@@ -112,26 +90,26 @@ public class ClassAnalyzer implements ParseTreeListener {
 					//a string identified
 					if(typeCtx.unannReferenceType().unannClassOrInterfaceType().getText().contains(RecognizedKeywords.PRIMITIVE_TYPE_STRING)) {
 						UnannClassOrInterfaceTypeContext classInterfaceCtx = typeCtx.unannReferenceType().unannClassOrInterfaceType();
-						identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, classInterfaceCtx.getText());
+						this.identifiedTokens.addToken(PRIMITIVE_TYPE_KEY, classInterfaceCtx.getText());
 					}
 					
 					//create a field analyzer to walk through declarations
-					FieldAnalyzer fieldAnalyzer = new FieldAnalyzer(identifiedTokens, declaredClassScope);
+					FieldAnalyzer fieldAnalyzer = new FieldAnalyzer(this.identifiedTokens, this.declaredClassScope);
 					fieldAnalyzer.analyze(fieldCtx.variableDeclaratorList());
 					
 					//clear tokens for reause
-					identifiedTokens.clearTokens();
+					this.identifiedTokens.clearTokens();
 				}
 			}
 		}
 		
 		else if(ctx instanceof MethodDeclarationContext) {
 			MethodDeclarationContext methodDecCtx = (MethodDeclarationContext) ctx;
-			MethodAnalyzer methodAnalyzer = new MethodAnalyzer(identifiedTokens, declaredClassScope);
+			MethodAnalyzer methodAnalyzer = new MethodAnalyzer(this.identifiedTokens, this.declaredClassScope);
 			methodAnalyzer.analyze(methodDecCtx);
 			
 			//reuse tokens
-			identifiedTokens.clearTokens();
+			this.identifiedTokens.clearTokens();
 		}
 	}
 	

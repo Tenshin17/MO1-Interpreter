@@ -50,7 +50,7 @@ public class ForControlAnalyzer implements ParseTreeListener {
 		else if(ctx instanceof ForUpdateContext) {
 			ForUpdateContext forUpdateCtx = (ForUpdateContext) ctx;
 			StatementExpressionContext exprCtx = forUpdateCtx.statementExpressionList().statementExpression(0);
-			
+
 			if(StatementExpressionAnalyzer.isAssignmentExpression(exprCtx))
 				this.updateCommand = new AssignCom(exprCtx.assignment().leftHandSide(), exprCtx.assignment().expression());
 			else if(StatementExpressionAnalyzer.isIncrementExpression(exprCtx))

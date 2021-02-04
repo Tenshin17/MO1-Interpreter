@@ -62,3 +62,126 @@ public class Main {
   }
 
 }
+
+
+//JavaTest
+public class Main {
+  private static int mynum;
+  private static Temp myClass;
+  public class Temp{
+  }
+  public int sq(int i, int z){
+    return 5;
+  }
+
+  public static void main(String args[]) {
+  	int[] x = new int[5];
+  	int a = 5;
+  	a = 10 + 3;
+  	a++;
+  	x[1] = 5;
+  	print("s"+x);
+  	scan("temp",a);
+  	sq(a,3);
+  	if(a<6) {
+  	    if(True){}
+  	}
+  	if(a>6) {
+  	    if(True){
+  	        if(True){}
+  	    }
+  	    sq();
+  	}
+  	else{}
+  	while(True){
+  	    while(True){}
+  	}
+  	for(int i=0;i<5;i++){i=6;}
+  }
+
+}
+
+public class Main {
+
+  public static void main(String args[]) {
+  	int a = 5;
+  	a = 10 + 3;
+  	scan("temp",a);
+  	print(a);
+  	print("Hello World");
+  }
+
+}
+
+public class Main {
+
+  public static void main(String args[]) {
+  	int[] x = new int[5];
+  	int a = 5;
+  	a = 10 + 3;
+  	a++;
+  	x[0]=12;
+  	print(a);
+
+  	print(x[0]);
+  	if(a<20) {
+  	    print("Hello world");
+  	}
+  	for(int i=0;i<5;i++) {
+  		if(i<3) {
+  			print(a);
+  		}
+  	}
+  }
+
+}
+
+
+//Baraco Test
+class Main :
+  int sq(int i, int z):
+    return 5;
+  end
+
+  void main() :
+  	int[] x = new int[5];
+  	int a = 5;
+  	a = 10;
+  	x[1] = 3;
+  	print(3+a+9);
+  	sq(a,3);
+  end
+
+end
+
+
+//myJava Test
+class Main {
+  int sq(int i, int z){
+    return 5;
+  }
+
+  void main() {
+  	int[] x = new int[5];
+  	int a = 5;
+  	a = 10;
+  	x[1] = 3;
+  	print(3+a+9);
+  	sq(a,3);
+  	if(a<6) {
+        if(True){}
+    }
+    if(a>6) {
+        if(True){
+            if(True){}
+        }
+        sq();
+    }
+    else{}
+    while(True){
+        while(True){}
+    }
+    for(int i=0;i<5;i++){i=6;}
+  }
+
+}

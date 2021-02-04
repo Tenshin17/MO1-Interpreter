@@ -4,6 +4,9 @@ import Execution.ExecutionManager;
 import Execution.command.ICommand;
 import Execution.command.ICondCommand;
 import Execution.command.ICtrlCommand;
+import Execution.command.controlled.ForCom;
+import Execution.command.controlled.IfCom;
+import Execution.command.controlled.WhileCom;
 import semantic.utils.StringUtils;
 
 import java.util.Stack;
@@ -123,11 +126,19 @@ public class StatementControlOverseer {
 			ICommand childCommand = this.procedureCallStack.pop();
 			ICommand parentCommand = this.procedureCallStack.peek();
 			this.activeControlledCommand = parentCommand;
-			
-			if(parentCommand instanceof ICtrlCommand) {
-				ICtrlCommand controlledCommand = (ICtrlCommand) parentCommand;
-				controlledCommand.addCommand(childCommand);
 
+			if (childCommand instanceof ForCom || childCommand instanceof WhileCom) {
+				if (parentCommand instanceof ForCom || parentCommand instanceof WhileCom) {
+					ICtrlCommand controlledCommand = (ICtrlCommand) parentCommand;
+					controlledCommand.addCommand(childCommand);
+				} else if (parentCommand instanceof IfCom) {
+					ICondCommand controlledCommand = (ICondCommand) parentCommand;
+
+					if(isInPositiveRule())
+						controlledCommand.addPositiveCommand(childCommand);
+					else
+						controlledCommand.addNegativeCommand(childCommand);
+				}
 			}
 		}
 		else {

@@ -83,25 +83,25 @@ public class ClassIdentifierMapper implements ParseTreeListener, IValueMapper {
 				String variableKey = primaryCtx.getText();
 				ClassScope classScope = SymbolTableManager.getInstance().getClassScope(ParserHandler.getInstance().getCurrentClassName());
 				
-				javaValue = classScope.searchVariableIncludingLocal(variableKey);
-				modifiedExp = modifiedExp.replace(variableKey, javaValue.getValue().toString());
+				this.javaValue = classScope.searchVariableIncludingLocal(variableKey);
+				this.modifiedExp = this.modifiedExp.replace(variableKey, this.javaValue.getValue().toString());
 			}
 		}
 	}
 	
 	@Override
 	public JavaValue getJavaValue() {
-		return javaValue;
+		return this.javaValue;
 	}
 
 	@Override
 	public String getOriginalExp() {
-		return originalExp;
+		return this.originalExp;
 	}
 
 	@Override
 	public String getModifiedExp() {
-		return modifiedExp;
+		return this.modifiedExp;
 	}
 
 }

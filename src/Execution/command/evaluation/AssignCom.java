@@ -77,17 +77,11 @@ public class AssignCom implements ICommand, ParseTreeListener {
 	@Override
 	public void execute() {
 		//System.out.println(this.rightHandExprCtx);
-		if(this.rightHandExprCtx.getText().contains("[")) {
-			this.modifiedExp = this.rightHandExprCtx.getText();
-		}
-		else {
-			ParseTreeWalker functionWalker = new ParseTreeWalker();
-			functionWalker.walk(new FunctionCallVerifier(), this.rightHandExprCtx);
-		}
 		EvaluationCommand evaluationCommand = new EvaluationCommand(this.rightHandExprCtx);
 		evaluationCommand.execute();
 
 		if(this.isLeftHandArrayAccessor()) {
+			System.out.println("Im an Array");
 			this.handleArrayAssignment(evaluationCommand.getResult().toEngineeringString());
 		}
 		else {

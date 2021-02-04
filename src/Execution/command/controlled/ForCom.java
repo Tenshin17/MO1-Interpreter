@@ -5,7 +5,8 @@ import Execution.ExecutionMonitor;
 import Execution.command.ICommand;
 import Execution.command.ICtrlCommand;
 import Execution.command.utils.CondEval;
-import antlr.Java8Parser.ExpressionContext;
+import antlr.Java8Parser;
+import antlr.Java8Parser.ConditionalExpressionContext;
 import antlr.Java8Parser.LocalVariableDeclarationContext;
 import semantic.analyzers.LocalVariableAnalyzer;
 import semantic.mapping.IValueMapper;
@@ -20,12 +21,12 @@ public class ForCom implements ICtrlCommand{
     private List<ICommand> commandSequences;
 
     private LocalVariableDeclarationContext localVarDecCtx; //a local variable ctx that is evaluated at the start of the for loop
-    private ExpressionContext conditionalExpr; //the condition to satisfy
+    private ConditionalExpressionContext conditionalExpr; //the condition to satisfy
     private ICommand updateCommand; //the update command after every iteration
 
     private String modifiedConditionExpr;
 
-    public ForCom(LocalVariableDeclarationContext localVarDecCtx, ExpressionContext conditionalExpr, ICommand updateCommand) {
+    public ForCom(LocalVariableDeclarationContext localVarDecCtx, ConditionalExpressionContext conditionalExpr, ICommand updateCommand) {
         this.localVarDecCtx = localVarDecCtx;
         this.conditionalExpr = conditionalExpr;
         this.updateCommand = updateCommand;

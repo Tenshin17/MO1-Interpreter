@@ -80,6 +80,8 @@ public class IDE {
             public void actionPerformed(ActionEvent e) {
                 ConsolePane.setText("");
                 txaOutput.setText("");
+                if(consoleListModel != null)
+                    consoleListModel.clear();
             }
         });
 
@@ -107,8 +109,6 @@ public class IDE {
     }
 
     public void run(String srccode){
-        if(consoleListModel != null && (ConsolePane.getText().length() != 0 || txaOutput.getText().length() != 0))
-            consoleListModel.clear();
         CharStream input = CharStreams.fromString(srccode);
         Java8Lexer lexer = new Java8Lexer(input);
         Java8Parser parser = new Java8Parser(new CommonTokenStream(lexer));
@@ -2554,7 +2554,7 @@ public class IDE {
 
         //consoleList.setSelectedIndex(0);
         consoleListModel = ExecutionManager.getExecutionManager().consoleListModel;
-        consoleListModel.clear();
+        //consoleListModel.clear();
         // consoleListModel = errorListener.getConsoleListModel();
         //errorPositionList = errorListener.getErrorPositionList();
         //underlineErrors(errorPositionList);
@@ -2562,8 +2562,8 @@ public class IDE {
         consoleListModel.addListDataListener(new ListDataListener() {
             @Override
             public void intervalAdded(ListDataEvent e) {
-                System.out.println(consoleListModel.size()+"Check "+consoleListModel.get(consoleListModel.getSize()-1));
-                String msg = consoleListModel.get(consoleListModel.getSize()-1).toString();
+                System.out.println(consoleListModel.size()+"Check "+consoleListModel.get(consoleListModel.size()-1));
+                String msg = consoleListModel.get(consoleListModel.size()-1).toString();
                 if(msg.charAt(1) == 'P') {
                     msg = msg.replaceFirst("\\[PROGR] ","");
                     txaOutput.append(msg);
@@ -2571,6 +2571,8 @@ public class IDE {
                 else if(msg.charAt(1) == 'E') {
                     appendToPane(ConsolePane, msg, Color.RED);
                 }
+                //if(consoleListModel.size()>0)
+                //    consoleListModel.remove(consoleListModel.getSize()-1);
             }
 
             @Override

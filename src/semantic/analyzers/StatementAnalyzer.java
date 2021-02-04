@@ -118,7 +118,7 @@ public class StatementAnalyzer {
 			ForControlAnalyzer forControlAnalyzer = new ForControlAnalyzer();
 			forControlAnalyzer.analyze(ctx.forStatement().basicForStatement());
 
-			ForCom forCommand = new ForCom(forControlAnalyzer.getLocalVarDecContext(), forControlAnalyzer.getExprContext(), forControlAnalyzer.getUpdateCommand());
+			ForCom forCommand = new ForCom(forControlAnalyzer.getLocalVarDecContext(), forControlAnalyzer.getExprContext().assignmentExpression().conditionalExpression(), forControlAnalyzer.getUpdateCommand());
 			StatementControlOverseer.getInstance().openControlledCommand(forCommand);
 
 			StatementContext statementCtx = ctx.forStatement().basicForStatement().statement();

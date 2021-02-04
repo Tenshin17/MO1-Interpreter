@@ -43,6 +43,8 @@ public class CondEval {
 
         int result = evaluationCommand.getResult().intValue();
 
+        System.out.println("Evaluating: " +conditionExprCtx.getText() + " Result: " +result);
+
         return (result == 1);
     }
 

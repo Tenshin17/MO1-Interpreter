@@ -43,6 +43,7 @@ public class ScanCom implements ICommand{
 
         // Saves the value to identifier
         JavaValue javaValue = JavaValueSearch.searchJavaValue(identifier);
+
         javaValue.setValue(valueEntered);
 
         // Continue executing the thread

@@ -2,6 +2,7 @@ package IDE;
 
 import Execution.ExecutionManager;
 import Execution.FunctionTracker;
+import Execution.command.evaluation.EvaluationCommand;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -25,6 +26,7 @@ import org.fife.ui.rsyntaxtextarea.*;
 import semantic.statements.StatementControlOverseer;
 import semantic.symboltable.SymbolTableManager;
 import semantic.symboltable.scope.LocalScopeCreator;
+import semantic.utils.Expression;
 
 public class IDE {
     public JToolBar toolBar;
@@ -45,6 +47,9 @@ public class IDE {
     private String code;
     private int lineNum;
     private ArrayList<Integer> errorPositionList;
+
+    private String prevMsg;
+    private int prevIdx;
 
     //public static final String INPUT_FILE = "src/input.txt";
 
@@ -2564,6 +2569,10 @@ public class IDE {
             public void intervalAdded(ListDataEvent e) {
                 System.out.println(consoleListModel.size()+"Check "+consoleListModel.get(consoleListModel.size()-1));
                 String msg = consoleListModel.get(consoleListModel.size()-1).toString();
+                if(msg.equals(prevMsg) && prevIdx == consoleListModel.size()-1)
+                    return;
+                prevMsg = consoleListModel.get(consoleListModel.size()-1).toString();
+                prevIdx = consoleListModel.size()-1;
                 if(msg.charAt(1) == 'P') {
                     msg = msg.replaceFirst("\\[PROGR] ","");
                     txaOutput.append(msg);
@@ -2615,6 +2624,7 @@ public class IDE {
     }
 
     public static void main(String args[]) {
+
         JFrame frame  = new JFrame("IDE");
         frame.setContentPane(new IDE().mainPanel);
         frame.setBounds(100, 100, 1366, 720);

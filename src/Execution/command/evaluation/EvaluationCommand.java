@@ -66,7 +66,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 			treeWalker.walk(this, this.parentCondCtx);
 
 		isNumeric = !this.modifiedExp.contains("\"") && !this.modifiedExp.contains("\'");
-
+		//System.out.println(this.modifiedExp+" "+isNumeric);
 		if (!isNumeric) {
 
 			if (this.modifiedExp.contains("==") || this.modifiedExp.contains("!=")) {
@@ -258,9 +258,11 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 	private void evaluateVariable(ExpressionNameContext exprCtx) {
 		JavaValue javaValue = VariableSearcher
 				.searchVariable(exprCtx.getText());
-		System.out.println(exprCtx.getText()+" "+javaValue.getValue().toString());
-		this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
-				javaValue.getValue().toString());
+		//System.out.println(exprCtx.getText()+" "+javaValue.getValue().toString());
+		if(javaValue.getPrimitiveType() == JavaValue.PrimitiveType.STRING || javaValue.getPrimitiveType() == JavaValue.PrimitiveType.CHAR)
+			this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),"\""+javaValue.getValue()+"\"");
+		else
+			this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(), javaValue.getValue().toString());
 	}
 
 	public boolean checkFloatArray(){

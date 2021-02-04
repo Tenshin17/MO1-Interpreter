@@ -52,15 +52,13 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		undeclaredChecker = new UndeclaredChecker(this.rightHandExprCtx);
 		undeclaredChecker.verify();
 
-		this.modifiedExp = this.rightHandExprCtx.getText();
+		//this.modifiedExp = this.rightHandExprCtx.getText();
 
 		ParseTreeWalker functionWalker = new ParseTreeWalker();
 		functionWalker.walk(new FunctionCallVerifier(), this.rightHandExprCtx);
 
 		//System.out.println(this.modifiedExp+" expr");
-
-		Expression evalEx = new Expression(this.modifiedExp);
-		BigDecimal result = evalEx.eval();
+		
 		//type check the javaValue
 		JavaValue javaValue;
 		if(ExecutionManager.getExecutionManager().isInFunctionExecution()) {
@@ -109,7 +107,7 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		ArrayAccessContext arrayIndexExprCtx = this.leftHandExprCtx.arrayAccess();
 
 		System.out.println(identifierNode.getText()+"HEEEEERRREEEEE"+resultString);
-		JavaValue javaValue = JavaValueSearch.searchJavaValue(identifierNode.getText());
+		JavaValue javaValue = VariableSearcher.searchVariable(identifierNode.getText());
 		JavaArray javaArray = (JavaArray) javaValue.getValue();
 
 		ParseTreeWalker treeWalker = new ParseTreeWalker();

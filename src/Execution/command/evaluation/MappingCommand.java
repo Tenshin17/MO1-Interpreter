@@ -42,7 +42,10 @@ public class MappingCommand implements ICommand {
 		evaluationCommand.execute();
 		
 		JavaValue javaValue = VariableSearcher.searchVariable(this.identifierString);
-		AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
+		if(evaluationCommand.isNumericResult())
+			AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
+		else
+			AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getStringResult());
 	}
 	
 	/*

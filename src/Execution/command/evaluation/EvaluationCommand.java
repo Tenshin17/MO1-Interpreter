@@ -119,7 +119,7 @@ public class EvaluationCommand implements ICommand, ParseTreeListener {
 				isNumeric = true;
 			}
 			else {
-				this.stringResult = StringUtils.removeQuotes(modifiedExp);
+				this.stringResult = StringUtils.removeQuotes(this.modifiedExp);System.out.println(this.modifiedExp+" "+this.stringResult);
 			}
 
 		} else {

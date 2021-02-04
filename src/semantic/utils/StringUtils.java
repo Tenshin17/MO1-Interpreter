@@ -6,7 +6,9 @@ package semantic.utils;
 public class StringUtils {
 
 	public static String removeQuotes(String stringWithQuotes) {
-		return stringWithQuotes.replace("\"", "");
+		String res = stringWithQuotes.replace("\"", "");
+		res = res.replace("'", "");
+		return res;
 	}
 	public static String formatError(String message){ return "[ERROR] " + message; }
 	public static String formatProgram(String message){ return "[PROGR] " + message; }

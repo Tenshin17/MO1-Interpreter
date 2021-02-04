@@ -43,9 +43,20 @@ public class AssignmentUtils {
 				} else {
 					javaValue.setValue(RecognizedKeywords.BOOLEAN_FALSE);
 				}
+			} else if (javaValue.getPrimitiveType() == PrimitiveType.CHAR) {
+				javaValue.setValue(evaluationValue.toEngineeringString());
+			} else if (javaValue.getPrimitiveType() == PrimitiveType.STRING) {
+				javaValue.setValue(evaluationValue.toEngineeringString());
 			} else {
 				System.out.println("JavaValue: No appropriate type :(");
 			}
+		}
+	}
+
+	public static void assignAppropriateValue(JavaValue javaValue, String stringValue) {
+		if(javaValue.getPrimitiveType() == JavaValue.PrimitiveType.STRING ||
+				javaValue.getPrimitiveType() == JavaValue.PrimitiveType.CHAR) {
+			javaValue.setValue(stringValue);
 		}
 	}
 

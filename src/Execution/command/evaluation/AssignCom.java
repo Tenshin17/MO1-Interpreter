@@ -58,7 +58,7 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		functionWalker.walk(new FunctionCallVerifier(), this.rightHandExprCtx);
 
 		//System.out.println(this.modifiedExp+" expr");
-		
+
 		//type check the javaValue
 		JavaValue javaValue;
 		if(ExecutionManager.getExecutionManager().isInFunctionExecution()) {
@@ -84,7 +84,10 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		}
 		else {
 			JavaValue javaValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
-			AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
+			if(evaluationCommand.isNumericResult())
+				AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
+			else
+				AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getStringResult());
 		}
 	}
 

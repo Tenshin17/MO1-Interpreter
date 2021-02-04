@@ -49,6 +49,7 @@ public class ForCom implements ICtrlCommand{
                     command.execute();
                 }
 
+                executionMonitor.tryExecution();
                 this.updateCommand.execute(); //execute the update command
                 this.identifyVariables(); //identify variables again to detect changes to such variables used.
             }
@@ -59,7 +60,7 @@ public class ForCom implements ICtrlCommand{
     }
 
     private void evaluateLocalVariable() {
-        if(localVarDecCtx != null) {
+        if(this.localVarDecCtx != null) {
             LocalVariableAnalyzer localVarAnalyzer = new LocalVariableAnalyzer();
             localVarAnalyzer.markImmediateExecution();
             localVarAnalyzer.analyze(this.localVarDecCtx);

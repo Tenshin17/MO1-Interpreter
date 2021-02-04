@@ -21,7 +21,7 @@ public class WhileCom implements ICtrlCommand {
     protected String modifiedConditionExpr;
 
     public WhileCom(ConditionalExpressionContext conditionalExpr) {
-        commandSequences = new ArrayList<>();
+        this.commandSequences = new ArrayList<>();
         this.conditionalExpr = conditionalExpr;
     }
 
@@ -33,8 +33,8 @@ public class WhileCom implements ICtrlCommand {
 
         try {
             //evaluate the given condition
-            while(CondEval.evaluateCondition(conditionalExpr)) {
-                for(ICommand command : commandSequences) {
+            while(CondEval.evaluateCondition(this.conditionalExpr)) {
+                for(ICommand command : this.commandSequences) {
                     executionMonitor.tryExecution();
                     command.execute();
                 }
@@ -48,10 +48,10 @@ public class WhileCom implements ICtrlCommand {
     }
 
     protected void identifyVariables() {
-        IValueMapper identifierMapper = new IdentifierMapper(conditionalExpr.getText());
-        identifierMapper.analyze(conditionalExpr);
+        IValueMapper identifierMapper = new IdentifierMapper(this.conditionalExpr.getText());
+        identifierMapper.analyze(this.conditionalExpr);
 
-        modifiedConditionExpr = identifierMapper.getModifiedExp();
+        this.modifiedConditionExpr = identifierMapper.getModifiedExp();
     }
 
     @Override
@@ -63,11 +63,11 @@ public class WhileCom implements ICtrlCommand {
     public void addCommand(ICommand command) {
 
         ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Added command to WHILE"));
-        commandSequences.add(command);
+        this.commandSequences.add(command);
     }
 
     public int getCommandCount() {
-        return commandSequences.size();
+        return this.commandSequences.size();
     }
 
 }

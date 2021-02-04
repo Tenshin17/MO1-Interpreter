@@ -58,6 +58,10 @@ public class IDE {
         txaInput = new RSyntaxTextArea(20, 60);
         txaInput.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         txaInput.setCodeFoldingEnabled(true);
+        Font font = txaInput.getFont();
+        txaInput.setFont( font.deriveFont(font.getSize() + 10.0f) );
+        txaOutput.setFont( font.deriveFont(font.getSize() + 10.0f) );
+        ConsolePane.setFont(font.deriveFont(font.getSize() + 10.0f));
         RTextScrollPane sp = new RTextScrollPane(txaInput);
         InputPanel.add(sp);
 

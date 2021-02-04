@@ -24,24 +24,24 @@ public class MappingCommand implements ICommand {
 	
 	public MappingCommand(String identifierString, ExpressionContext exprCtx) {
 		this.identifierString = identifierString;
-		parentExprCtx = exprCtx;
+		this.parentExprCtx = exprCtx;
 		
-		UndeclaredChecker undeclaredChecker = new UndeclaredChecker(parentExprCtx);
+		UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.parentExprCtx);
 		undeclaredChecker.verify();
 		
 		ParseTreeWalker functionWalker = new ParseTreeWalker();
-		functionWalker.walk(new FunctionCallVerifier(), parentExprCtx);
+		functionWalker.walk(new FunctionCallVerifier(), this.parentExprCtx);
 		
 	}
 
 	@Override
 	public void execute() {
-		modifiedExp = parentExprCtx.getText();
+		this.modifiedExp = parentExprCtx.getText();
 		
-		EvaluationCommand evaluationCommand = new EvaluationCommand(parentExprCtx);
+		EvaluationCommand evaluationCommand = new EvaluationCommand(this.parentExprCtx);
 		evaluationCommand.execute();
 		
-		JavaValue javaValue = VariableSearcher.searchVariable(identifierString);
+		JavaValue javaValue = VariableSearcher.searchVariable(this.identifierString);
 		AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
 	}
 	
@@ -49,6 +49,6 @@ public class MappingCommand implements ICommand {
 	 * Returns the modified exp, with mapped values.
 	 */
 	public String getModifiedExp() {
-		return modifiedExp;
+		return this.modifiedExp;
 	}
 }

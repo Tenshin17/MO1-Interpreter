@@ -24,18 +24,21 @@ public class ConstChecker implements IErrorChecker, ParseTreeListener {
 
 	public ConstChecker(ExpressionStatementContext exprCtx) {
 		this.exprCtx = exprCtx;
-		lineNumber = exprCtx.getStart().getLine();
+		this.lineNumber = this.exprCtx.getStart().getLine();
 	}
 
 	public ConstChecker(LeftHandSideContext exprCtx) {
 		this.lhsCtx = exprCtx;
-		lineNumber = exprCtx.getStart().getLine();
+		this.lineNumber = this.lhsCtx.getStart().getLine();
 	}
 
 	@Override
 	public void verify() {
 		ParseTreeWalker treeWalker = new ParseTreeWalker();
-		treeWalker.walk(this, exprCtx);
+		if(this.exprCtx != null)
+			treeWalker.walk(this, this.exprCtx);
+		else if(this.lhsCtx != null)
+			treeWalker.walk(this,this.lhsCtx);
 	}
 
 	@Override
@@ -82,7 +85,7 @@ public class ConstChecker implements IErrorChecker, ParseTreeListener {
 
 		if(javaValue != null && isConstFormat(varExprCtx)) {
 			javaValue.markFinal();
-			CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.CONST_REASSIGNMENT, varExprCtx.getText(), lineNumber);
+			CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.CONST_REASSIGNMENT, varExprCtx.getText(), this.lineNumber);
 		}
 	}
 

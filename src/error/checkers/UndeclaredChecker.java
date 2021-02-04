@@ -36,18 +36,21 @@ public class UndeclaredChecker implements IErrorChecker, ParseTreeListener {
 
 	public UndeclaredChecker(ExpressionContext exprCtx) {
 		this.exprCtx = exprCtx;
-		lineNumber = this.exprCtx.getStart().getLine();
+		this.lineNumber = this.exprCtx.getStart().getLine();
 	}
 
 	public UndeclaredChecker(LeftHandSideContext exprCtx) {
 		this.lhsCtx = exprCtx;
-		lineNumber = this.exprCtx.getStart().getLine();
+		this.lineNumber = this.lhsCtx.getStart().getLine();
 	}
 
 	@Override
 	public void verify() {
 		ParseTreeWalker treeWalker = new ParseTreeWalker();
-		treeWalker.walk(this, exprCtx);
+		if(this.exprCtx != null)
+			treeWalker.walk(this, this.exprCtx);
+		else if(this.lhsCtx != null)
+			treeWalker.walk(this,this.lhsCtx);
 	}
 
 	@Override

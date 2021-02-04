@@ -3,6 +3,7 @@ package Execution.command.evaluation;
 import antlr.Java8Lexer;
 import antlr.Java8Parser.*;
 import antlr.Java8Parser.ExpressionContext;
+import error.CustomErrorStrategy;
 import error.checkers.ConstChecker;
 import error.checkers.TypeChecker;
 import error.checkers.UndeclaredChecker;
@@ -14,11 +15,13 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import semantic.analyzers.FunctionCallVerifier;
 import semantic.representation.JavaArray;
 import semantic.representation.JavaValue;
+import semantic.representation.JavaValueSearch;
 import semantic.searching.VariableSearcher;
 import semantic.utils.AssignmentUtils;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import semantic.utils.Expression;
+import semantic.utils.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,6 +42,7 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		this.leftHandExprCtx = leftHandExprCtx;
 		this.rightHandExprCtx = rightHandExprCtx;
 
+		//System.out.println(this.leftHandExprCtx.getText()+" "+this.rightHandExprCtx.getText());
 		UndeclaredChecker undeclaredChecker = new UndeclaredChecker(this.leftHandExprCtx);
 		undeclaredChecker.verify();
 
@@ -48,9 +52,15 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		undeclaredChecker = new UndeclaredChecker(this.rightHandExprCtx);
 		undeclaredChecker.verify();
 
+		this.modifiedExp = this.rightHandExprCtx.getText();
+
 		ParseTreeWalker functionWalker = new ParseTreeWalker();
 		functionWalker.walk(new FunctionCallVerifier(), this.rightHandExprCtx);
 
+		//System.out.println(this.modifiedExp+" expr");
+
+		Expression evalEx = new Expression(this.modifiedExp);
+		BigDecimal result = evalEx.eval();
 		//type check the javaValue
 		JavaValue javaValue;
 		if(ExecutionManager.getExecutionManager().isInFunctionExecution()) {
@@ -66,49 +76,80 @@ public class AssignCom implements ICommand, ParseTreeListener {
 
 	@Override
 	public void execute() {
-		EvaluationCommand evaluationCommand = new EvaluationCommand(rightHandExprCtx);
+		//System.out.println(this.rightHandExprCtx);
+		EvaluationCommand evaluationCommand = new EvaluationCommand(this.rightHandExprCtx);
 		evaluationCommand.execute();
 
-		if(isLeftHandArrayAccessor()) {
-			handleArrayAssignment(evaluationCommand.getResult().toEngineeringString());
+		if(this.isLeftHandArrayAccessor()) {
+			this.handleArrayAssignment(evaluationCommand.getResult().toEngineeringString());
 		}
 		else {
-			JavaValue javaValue = VariableSearcher.searchVariable(leftHandExprCtx.getText());
+			JavaValue javaValue = VariableSearcher.searchVariable(this.leftHandExprCtx.getText());
 			AssignmentUtils.assignAppropriateValue(javaValue, evaluationCommand.getResult());
 		}
 	}
 
 	private boolean isLeftHandArrayAccessor() {
-		List<TerminalNode> lBrackTokens = leftHandExprCtx.getTokens(Java8Lexer.LBRACK);
-		List<TerminalNode> rBrackTokens = leftHandExprCtx.getTokens(Java8Lexer.RBRACK);
+		List<TerminalNode> lBrackTokens = this.leftHandExprCtx.getTokens(Java8Lexer.LBRACK);
+		List<TerminalNode> rBrackTokens = this.leftHandExprCtx.getTokens(Java8Lexer.RBRACK);
+		if(this.leftHandExprCtx.arrayAccess() != null) {
+			lBrackTokens = this.leftHandExprCtx.arrayAccess().getTokens(Java8Lexer.LBRACK);
+			rBrackTokens = this.leftHandExprCtx.arrayAccess().getTokens(Java8Lexer.RBRACK);
+		}
+		else {
+			return false;
+		}
 
 		return(lBrackTokens.size() > 0 && rBrackTokens.size() > 0);
 	}
 
 	private void handleArrayAssignment(String resultString) {
-		TerminalNode identifierNode = leftHandExprCtx.expressionName().Identifier();
-		ArrayAccessContext arrayIndexExprCtx = leftHandExprCtx.arrayAccess();
+		TerminalNode identifierNode = this.leftHandExprCtx.arrayAccess().expressionName().Identifier();
+		ArrayAccessContext arrayIndexExprCtx = this.leftHandExprCtx.arrayAccess();
 
-		JavaValue javaValue = VariableSearcher.searchVariable(identifierNode.getText());
+		System.out.println(identifierNode.getText()+"HEEEEERRREEEEE"+resultString);
+		JavaValue javaValue = JavaValueSearch.searchJavaValue(identifierNode.getText());
 		JavaArray javaArray = (JavaArray) javaValue.getValue();
 
-		BigDecimal resultValue;
 		ParseTreeWalker treeWalker = new ParseTreeWalker();
 		treeWalker.walk(this, arrayIndexExprCtx);
 
-		Expression evalEx = new Expression(arrayIndexExprCtx.getText());
-		resultValue = evalEx.eval();
-		//EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx);
+		//Expression evalEx = new Expression(arrayIndexExprCtx.getText());
+		//resultValue = evalEx.eval();
+		EvaluationCommand evaluationCommand = new EvaluationCommand(arrayIndexExprCtx.expression(0));
+		evaluationCommand.execute();
+
+		//create a new array value to replace value at specified index
+		JavaValue newArrayValue = new JavaValue(null, javaArray.getPrimitiveType());
+		newArrayValue.setValue(resultString);
+		System.out.println(resultString+" ffff "+evaluationCommand.getResult().intValue());
+		javaArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
+
+		//Console.log("Index to access: " +evaluationCommand.getResult().intValue()+ " Updated with: " +resultString);
+	}
+/*
+	private void handleArrayRetrieval(String resultString) {
+		String arrayIdentifier =  this.rightHandExprCtx.getText();
+		String[] arrayParts = arrayIdentifier.split("\\[");
+		arrayParts[1] = arrayParts[1].replace("]","");
+		JavaValue javaValue = VariableSearcher.searchVariable(arrayParts[0]);
+		JavaArray javaArray = (JavaArray) javaValue.getValue();
+
+		ParseTreeWalker treeWalker = new ParseTreeWalker();
+		treeWalker.walk(this, this.rightHandExprCtx);
+
+		//Expression evalEx = new Expression(arrayIndexExprCtx.getText());
+		//resultValue = evalEx.eval();
+		//EvaluationCommand evaluationCommand = new EvaluationCommand(this.rightHandExprCtx.expression(0));
 		//evaluationCommand.execute();
 
 		//create a new array value to replace value at specified index
 		JavaValue newArrayValue = new JavaValue(null, javaArray.getPrimitiveType());
 		newArrayValue.setValue(resultString);
-		javaArray.updateValueAt(newArrayValue, resultValue.intValue());
-
-		//Console.log("Index to access: " +evaluationCommand.getResult().intValue()+ " Updated with: " +resultString);
+		javaArray.updateValueAt(newArrayValue, evaluationCommand.getResult().intValue());
+		AssignmentUtils.assignAppropriateValue(javaValue, javaValue);
 	}
-
+*/
 	@Override
 	public void visitTerminal(TerminalNode terminalNode) {
 
@@ -127,6 +168,12 @@ public class AssignCom implements ICommand, ParseTreeListener {
 				evaluateVariable(exprCtx);
 			}
 		}
+		else if (ctx instanceof ExpressionNameContext ctx) {
+			ExpressionNameContext exprCtx = (ExpressionNameContext) ctx;
+			if(EvaluationCommand.isVariableOrConst(exprCtx)) {
+				evaluateVariable(exprCtx);
+			}
+		}
 	}
 
 	@Override
@@ -138,7 +185,15 @@ public class AssignCom implements ICommand, ParseTreeListener {
 		JavaValue javaValue = VariableSearcher
 				.searchVariable(exprCtx.getText());
 
-		modifiedExp = modifiedExp.replaceFirst(exprCtx.getText(),
+		this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
+				javaValue.getValue().toString());
+	}
+
+	private void evaluateVariable(ExpressionNameContext exprCtx) {
+		JavaValue javaValue = VariableSearcher
+				.searchVariable(exprCtx.getText());
+
+		this.modifiedExp = this.modifiedExp.replaceFirst(exprCtx.getText(),
 				javaValue.getValue().toString());
 	}
 }

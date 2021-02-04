@@ -1,5 +1,6 @@
 package Execution.command.evaluation;
 
+import Execution.ExecutionManager;
 import antlr.Java8Parser.DimExprContext;
 import antlr.Java8Parser.ExpressionContext;
 import Execution.command.ICommand;
@@ -12,24 +13,23 @@ import semantic.representation.JavaArray;
 public class ArrayInitCom implements ICommand {
 	
 	private JavaArray assignedJavaArray;
-	private DimExprContext arrayCreatorCtx;
+	private DimExprContext dimExprContext;
 	
-	public ArrayInitCom(JavaArray javaArray, DimExprContext arrayCreatorCtx) {
-		assignedJavaArray = javaArray;
-		this.arrayCreatorCtx = arrayCreatorCtx;
+	public ArrayInitCom(JavaArray javaArray, DimExprContext dimExprContext) {
+		this.assignedJavaArray = javaArray;
+		this.dimExprContext = dimExprContext;
 	}
 	@Override
 	public void execute() {
-		ExpressionContext exprCtx = arrayCreatorCtx.expression();
+		ExpressionContext exprCtx = dimExprContext.expression();
         System.out.println("another one");
 
 		if(exprCtx != null) {
 			EvaluationCommand evaluationCommand = new EvaluationCommand(exprCtx);
 			System.out.println("ahhhhh");
 			evaluationCommand.arrayExecute();
-			//if(evaluationCommand.checkFloatArray(exprCtx.getText())) {
-                assignedJavaArray.initializeSize(evaluationCommand.getResult().intValue());
-            //}
+
+			this.assignedJavaArray.initializeSize(evaluationCommand.getResult().intValue());
 
 		}
 

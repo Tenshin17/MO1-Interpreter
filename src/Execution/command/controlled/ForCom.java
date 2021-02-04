@@ -30,26 +30,26 @@ public class ForCom implements ICtrlCommand{
         this.conditionalExpr = conditionalExpr;
         this.updateCommand = updateCommand;
 
-        commandSequences = new ArrayList<>();
+        this.commandSequences = new ArrayList<>();
     }
 
     @Override
     public void execute() {
-        evaluateLocalVariable();
-        identifyVariables();
+        this.evaluateLocalVariable();
+        this.identifyVariables();
 
         ExecutionMonitor executionMonitor = ExecutionManager.getExecutionManager().getExecutionMonitor();
 
         try {
             //evaluate the given condition
-            while(CondEval.evaluateCondition(conditionalExpr)) {
-                for(ICommand command : commandSequences) {
+            while(CondEval.evaluateCondition(this.conditionalExpr)) {
+                for(ICommand command : this.commandSequences) {
                     executionMonitor.tryExecution();
                     command.execute();
                 }
 
-                updateCommand.execute(); //execute the update command
-                identifyVariables(); //identify variables again to detect changes to such variables used.
+                this.updateCommand.execute(); //execute the update command
+                this.identifyVariables(); //identify variables again to detect changes to such variables used.
             }
 
         } catch(InterruptedException e) {
@@ -61,15 +61,15 @@ public class ForCom implements ICtrlCommand{
         if(localVarDecCtx != null) {
             LocalVariableAnalyzer localVarAnalyzer = new LocalVariableAnalyzer();
             localVarAnalyzer.markImmediateExecution();
-            localVarAnalyzer.analyze(localVarDecCtx);
+            localVarAnalyzer.analyze(this.localVarDecCtx);
         }
     }
 
     private void identifyVariables() {
-        IValueMapper identifierMapper = new IdentifierMapper(conditionalExpr.getText());
-        identifierMapper.analyze(conditionalExpr);
+        IValueMapper identifierMapper = new IdentifierMapper(this.conditionalExpr.getText());
+        identifierMapper.analyze(this.conditionalExpr);
 
-        modifiedConditionExpr = identifierMapper.getModifiedExp();
+        this.modifiedConditionExpr = identifierMapper.getModifiedExp();
     }
 
     @Override
@@ -80,11 +80,11 @@ public class ForCom implements ICtrlCommand{
     @Override
     public void addCommand(ICommand command) {
         ExecutionManager.getExecutionManager().consoleListModel.addElement(StringUtils.formatDebug("Added command to FOR"));
-        commandSequences.add(command);
+        this.commandSequences.add(command);
     }
 
     public int getCommandCount() {
-        return commandSequences.size();
+        return this.commandSequences.size();
     }
 
 }

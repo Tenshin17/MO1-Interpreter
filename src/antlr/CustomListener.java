@@ -11,8 +11,6 @@ import java.util.List;
 
 public class CustomListener implements Java8Listener {
 
-    private boolean hasMain = false;
-
     @Override
     public void enterLiteral(Java8Parser.LiteralContext ctx) {
 
@@ -706,8 +704,7 @@ public class CustomListener implements Java8Listener {
 
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
-        if(ctx.methodHeader().methodDeclarator().Identifier().getText().equals("main") && !hasMain) {
-            hasMain = true;
+        if(ctx.methodHeader().methodDeclarator().Identifier().getText().contains("main")) {
             MainAnalyzer mainAnalyzer = new MainAnalyzer();
             mainAnalyzer.analyze(ctx);
         }

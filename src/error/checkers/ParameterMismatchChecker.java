@@ -25,23 +25,23 @@ public class ParameterMismatchChecker implements IErrorChecker {
 		this.javaMethod = javaMethod;
 
 		if(argumentsCtx != null) {
-			exprCtxList = argumentsCtx.expression();
+			this.exprCtxList = argumentsCtx.expression();
 		}
 		
-		lineNumber = argumentsCtx.getStart().getLine();
+		this.lineNumber = argumentsCtx.getStart().getLine();
 	}
 
 	@Override
 	public void verify() {
-		if(javaMethod == null) {
+		if(this.javaMethod == null) {
 			return;
 		}
 		
-		if(exprCtxList == null && javaMethod.getParameterValueSize() != 0) {
-			CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.PARAMETER_COUNT_MISMATCH, javaMethod.getFunctionName(), lineNumber);
+		if(this.exprCtxList == null && this.javaMethod.getParameterValueSize() != 0) {
+			CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.PARAMETER_COUNT_MISMATCH, this.javaMethod.getFunctionName(), this.lineNumber);
 		}
-		else if(exprCtxList != null && exprCtxList.size() != javaMethod.getParameterValueSize()) {
-			CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.PARAMETER_COUNT_MISMATCH, javaMethod.getFunctionName(), lineNumber);
+		else if(this.exprCtxList != null && this.exprCtxList.size() != this.javaMethod.getParameterValueSize()) {
+			CustomErrorStrategy.reportSemanticError(CustomErrorStrategy.PARAMETER_COUNT_MISMATCH, this.javaMethod.getFunctionName(), this.lineNumber);
 		}
 	}
 

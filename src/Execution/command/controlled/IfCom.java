@@ -22,8 +22,8 @@ public class IfCom implements ICondCommand {
     private String modifiedConditionExpr;
 
     public IfCom(ConditionalExpressionContext conditionalExpr) {
-        positiveCommands = new ArrayList<>();
-        negativeCommands = new ArrayList<>();
+        this.positiveCommands = new ArrayList<>();
+        this.negativeCommands = new ArrayList<>();
 
         this.conditionalExpr = conditionalExpr;
     }
@@ -36,15 +36,16 @@ public class IfCom implements ICondCommand {
 
         try {
             //execute the positive commands
-            if(CondEval.evaluateCondition(conditionalExpr)) {
-                for(ICommand command : positiveCommands) {
+            //System.out.println(this.conditionalExpr.getText()+"Check this");
+            if(CondEval.evaluateCondition(this.conditionalExpr)) {
+                for(ICommand command : this.positiveCommands) {
                     executionMonitor.tryExecution();
                     command.execute();
                 }
             }
             //execute the negative commands
             else {
-                for(ICommand command : negativeCommands) {
+                for(ICommand command : this.negativeCommands) {
                     executionMonitor.tryExecution();
                     command.execute();
                 }
@@ -56,10 +57,10 @@ public class IfCom implements ICondCommand {
     }
 
     private void identifyVariables() {
-        IValueMapper identifierMapper = new IdentifierMapper(conditionalExpr.getText());
-        identifierMapper.analyze(conditionalExpr);
+        IValueMapper identifierMapper = new IdentifierMapper(this.conditionalExpr.getText());
+        identifierMapper.analyze(this.conditionalExpr);
 
-        modifiedConditionExpr = identifierMapper.getModifiedExp();
+        this.modifiedConditionExpr = identifierMapper.getModifiedExp();
     }
 
     @Override
@@ -69,25 +70,25 @@ public class IfCom implements ICondCommand {
 
     @Override
     public void addPositiveCommand(ICommand command) {
-        positiveCommands.add(command);
+        this.positiveCommands.add(command);
     }
 
     @Override
     public void addNegativeCommand(ICommand command) {
-        negativeCommands.add(command);
+        this.negativeCommands.add(command);
     }
 
     public void clearAllCommands() {
-        positiveCommands.clear();
-        negativeCommands.clear();
+        this.positiveCommands.clear();
+        this.negativeCommands.clear();
     }
 
     public int getPositiveCommandsCount() {
-        return positiveCommands.size();
+        return this.positiveCommands.size();
     }
 
     public int getNegativeCommandsCount() {
-        return negativeCommands.size();
+        return this.negativeCommands.size();
     }
 
 }

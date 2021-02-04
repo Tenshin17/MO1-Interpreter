@@ -22,8 +22,8 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
 	
 	public TypeChecker(JavaValue assignmentJavaValue, ExpressionContext exprCtx) {
 		this.exprCtx = exprCtx;
-		javaValue = assignmentJavaValue;
-		lineNumber = exprCtx.getStart().getLine();
+		this.javaValue = assignmentJavaValue;
+		this.lineNumber = exprCtx.getStart().getLine();
 	}
 	
 	@Override
@@ -50,13 +50,13 @@ public class TypeChecker implements IErrorChecker, ParseTreeListener {
 	@Override
 	public void enterEveryRule(ParserRuleContext ctx) {
 		if(ctx instanceof LiteralContext) {
-			if(javaValue == null) {
+			if(this.javaValue == null) {
 				return;
 			}
 			LiteralContext literalCtx = (LiteralContext) ctx;
 			String expressionString = literalCtx.getText();
 
-			switch (javaValue.getPrimitiveType()) {
+			switch (this.javaValue.getPrimitiveType()) {
 				case ARRAY:
 					if (literalCtx.FloatingPointLiteral() != null){
 						String additionalMessage = "Incompatible type";

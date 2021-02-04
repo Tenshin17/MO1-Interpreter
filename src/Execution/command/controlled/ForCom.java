@@ -21,7 +21,7 @@ public class ForCom implements ICtrlCommand{
 
     private LocalVariableDeclarationContext localVarDecCtx; //a local variable ctx that is evaluated at the start of the for loop
     private ExpressionContext conditionalExpr; //the condition to satisfy
-    private ICommand updateCommand; //the update command aftery ever iteration
+    private ICommand updateCommand; //the update command after every iteration
 
     private String modifiedConditionExpr;
 
